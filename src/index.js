@@ -3,9 +3,15 @@ import ReactDOM from "react-dom";
 import "./index.css";
 
 function Square(props) {
+  let display = null;
+  if (!props.value) {
+    display = "-";
+  } else {
+    display = `Ty: ${props.value.Ty} C: ${props.value.Crestor}`;
+  }
   return (
     <button className="square" onClick={props.onClick}>
-      {props.value}
+      {display}
     </button>
   );
 }
@@ -26,7 +32,7 @@ class Organizer extends React.Component {
     for (let rowIdx = 0; rowIdx < this.props.rows; rowIdx++) {
       let row = [];
       for (let colIdx = 0; colIdx < this.props.cols; colIdx++) {
-        row.push(this.renderSquare(colIdx * this.props.cols + rowIdx));
+        row.push(this.renderSquare(colIdx + rowIdx * this.props.cols));
       }
       squares.push(
         <div key={rowIdx} className="board-row">
@@ -46,11 +52,18 @@ class Session extends React.Component {
     const rows = 2;
     const cols = 7;
     const bottles = ["Ty", "Crestor"];
-    // TODO: history needs to be mapping (perscription to number of pills) instead of the x/O text
+    const squares = [];
+    for (let i = 0; i < rows * cols; i++) {
+      let counts = {};
+      bottles.forEach((med) => {
+        counts[med] = 0;
+      });
+      squares.push(counts);
+    }
     this.state = {
       history: [
         {
-          squares: Array(rows * cols).fill(null),
+          squares: squares,
           selectedMed: bottles[0],
         },
       ],
@@ -63,18 +76,21 @@ class Session extends React.Component {
   }
 
   handleClick(i) {
-    // Square click handler
+    // Square click handler (adds a pill to the Square)
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
     if (calculateWinner(squares) || squares[i]) {
-      return;
+      // return;
     }
-    squares[i] = this.state.selectedMed;
+    // slice only creates a shallow copy of the squares, not the squares' counts
+    const newCount = Object.create(squares[i]);
+    newCount[this.state.selectedMed]++;
+    squares[i] = newCount;
     this.setState({
       history: history.concat([
         {
-          squares: squares, // this will be a count by med
+          squares: squares,
           selectedMed: this.state.selectedMed,
         },
       ]),
