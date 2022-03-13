@@ -48,14 +48,10 @@ class Session extends React.Component {
   // Session trying to match fulfill pill instructions
   constructor(props) {
     super(props);
-    // TODO: make these vars properties
-    const rows = 2;
-    const cols = 7;
-    const bottles = ["Ty", "Crestor"];
     const squares = [];
-    for (let i = 0; i < rows * cols; i++) {
+    for (let i = 0; i < this.props.rows * this.props.cols; i++) {
       let counts = {};
-      bottles.forEach((med) => {
+      this.props.bottles.forEach((med) => {
         counts[med] = 0;
       });
       squares.push(counts);
@@ -64,14 +60,14 @@ class Session extends React.Component {
       history: [
         {
           squares: squares,
-          selectedMed: bottles[0],
+          selectedMed: this.props.bottles[0],
         },
       ],
       stepNumber: 0,
-      medOptions: bottles,
-      selectedMed: bottles[0],
-      rows: rows,
-      cols: cols,
+      medOptions: this.props.bottles,
+      selectedMed: this.props.bottles[0],
+      rows: this.props.rows,
+      cols: this.props.cols,
     };
   }
 
@@ -166,12 +162,15 @@ class OverLord extends React.Component {
   // - (row/col changes)
   // - instruction changes
   render() {
+    const rows = 2;
+    const cols = 7;
+    const bottles = ["Ty", "Crestor"];
     return (
       <div>
         <div>
           <h1>Pill Master 3000</h1>
         </div>
-        <Session />
+        <Session rows={rows} cols={cols} bottles={bottles} />
       </div>
     );
   }
