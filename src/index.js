@@ -128,9 +128,12 @@ class Session extends React.Component {
       status = "Selected Medication: " + this.state.selectedMed;
     }
     const medOptions = this.state.medOptions.map((i, j) => {
+      const className = this.state.selectedMed == i ? "active" : "";
       return (
         <li key={j}>
-          <button onClick={() => this.setMedication(i)}>{i}</button>
+          <button className={className} onClick={() => this.setMedication(i)}>
+            {i}
+          </button>
         </li>
       );
     });
@@ -146,6 +149,7 @@ class Session extends React.Component {
           />
         </div>
         <div className="med-selection">
+          <h5>Select Medication</h5>
           <ul>{medOptions}</ul>
         </div>
         <div className="game-info">

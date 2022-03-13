@@ -24,12 +24,13 @@ ul {
   float: left;
   /* font-size: 24px; */
   font-weight: bold;
-  height: 50px;
+  height: 60px;
   margin-right: -1px;
   margin-top: -1px;
   padding: 0;
   text-align: center;
-  width: 50px;
+  width: 14.28%;
+  overflow: auto;
 }
 
 .square:focus {
@@ -47,4 +48,9 @@ ul {
 
 .game-info {
   margin-left: 20px;
+}
+
+.med-selection .active {
+  font-size: 1.1em;
+  background-color: lightblue;
 }
