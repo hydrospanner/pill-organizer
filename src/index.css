@@ -14,15 +14,10 @@ ul {
   display: table;
 }
 
-.status {
-  margin-bottom: 10px;
-}
-
 .square {
   background: #fff;
   border: 1px solid #999;
   float: left;
-  /* font-size: 24px; */
   font-weight: bold;
   height: 60px;
   margin-right: -1px;
@@ -44,10 +39,6 @@ ul {
 .game {
   display: flex;
   flex-direction: column;
-}
-
-.game-info {
-  margin-left: 20px;
 }
 
 .med-selection .active {

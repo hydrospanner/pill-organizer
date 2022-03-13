@@ -3,15 +3,18 @@ import ReactDOM from "react-dom";
 import "./index.css";
 
 function Square(props) {
-  let display = null;
-  if (!props.value) {
-    display = "-";
-  } else {
-    display = `Ty: ${props.value.Ty} C: ${props.value.Crestor}`;
+  const display = [];
+  for (const name in props.value) {
+    if (props.value[name]) {
+      display.push(`${name}: ${props.value[name]}`);
+    }
   }
+  const rows = display.map((txt, i) => {
+    return <div key={i}>{txt}</div>;
+  });
   return (
     <button className="square" onClick={props.onClick}>
-      {display}
+      {rows}
     </button>
   );
 }
