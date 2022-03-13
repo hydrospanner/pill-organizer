@@ -137,9 +137,17 @@ class Session extends React.Component {
         </li>
       );
     });
+    const header = this.props.header.map((day, i) => {
+      return (
+        <div key={i}>
+          <h3>{day}</h3>
+        </div>
+      );
+    });
 
     return (
       <div className="game">
+        <div className="board-header">{header}</div>
         <div className="game-board">
           <Organizer
             squares={current.squares}
@@ -167,14 +175,27 @@ class OverLord extends React.Component {
   // - instruction changes
   render() {
     const rows = 2;
-    const cols = 7;
     const bottles = ["Ty", "Crestor"];
+    const days = [
+      { name: "Sunday", abbr: "Sun" },
+      { name: "Monday", abbr: "Mon" },
+      { name: "Tuesday", abbr: "Tue" },
+      { name: "Wednesday", abbr: "Wed" },
+      { name: "Thursday", abbr: "Thu" },
+      { name: "Friday", abbr: "Fri" },
+      { name: "Saturday", abbr: "Sat" },
+    ];
     return (
       <div>
         <div>
           <h1>Pill Master 3000</h1>
         </div>
-        <Session rows={rows} cols={cols} bottles={bottles} />
+        <Session
+          rows={rows}
+          cols={days.length}
+          header={days.map((day) => day.abbr)}
+          bottles={bottles}
+        />
       </div>
     );
   }

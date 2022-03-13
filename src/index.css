@@ -54,3 +54,9 @@ ul {
   font-size: 1.1em;
   background-color: lightblue;
 }
+
+.board-header div {
+  display: inline-flex;
+  width: 14.28%;
+  justify-content: center;
+}
