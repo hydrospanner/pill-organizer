@@ -42,17 +42,20 @@ class Session extends React.Component {
   // Session trying to match fulfill pill instructions
   constructor(props) {
     super(props);
+    // TODO: make these vars properties
     const rows = 2;
     const cols = 7;
-    let bottles = ["Ty", "Crestor"];
+    const bottles = ["Ty", "Crestor"];
     // TODO: history needs to be mapping (perscription to number of pills) instead of the x/O text
     this.state = {
       history: [
         {
           squares: Array(rows * cols).fill(null),
+          selectedMed: bottles[0],
         },
       ],
       stepNumber: 0,
+      medOptions: bottles,
       selectedMed: bottles[0],
       rows: rows,
       cols: cols,
@@ -86,6 +89,12 @@ class Session extends React.Component {
     });
   }
 
+  setMedication(med) {
+    this.setState({
+      selectedMed: med,
+    });
+  }
+
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
@@ -102,10 +111,17 @@ class Session extends React.Component {
 
     let status;
     if (winner) {
-      status = "Your pill have been correctly organized!";
+      status = "Your pills have been correctly organized!";
     } else {
       status = "Selected Medication: " + this.state.selectedMed;
     }
+    const medOptions = this.state.medOptions.map((i, j) => {
+      return (
+        <li key={j}>
+          <button onClick={() => this.setMedication(i)}>{i}</button>
+        </li>
+      );
+    });
 
     return (
       <div className="game">
@@ -116,6 +132,9 @@ class Session extends React.Component {
             rows={this.state.rows}
             cols={this.state.cols}
           />
+        </div>
+        <div className="med-selection">
+          <ul>{medOptions}</ul>
         </div>
         <div className="game-info">
           <div>{status}</div>
