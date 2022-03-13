@@ -26,7 +26,6 @@ class Organizer extends React.Component {
     for (let rowIdx = 0; rowIdx < this.props.rows; rowIdx++) {
       let row = [];
       for (let colIdx = 0; colIdx < this.props.cols; colIdx++) {
-        // row.push(this.renderSquare(rowIdx * this.props.rows + colIdx));
         row.push(this.renderSquare(colIdx * this.props.cols + rowIdx));
       }
       squares.push(
@@ -45,6 +44,8 @@ class Session extends React.Component {
     super(props);
     const rows = 2;
     const cols = 7;
+    let bottles = ["Ty", "Crestor"];
+    // TODO: history needs to be mapping (perscription to number of pills) instead of the x/O text
     this.state = {
       history: [
         {
@@ -52,35 +53,36 @@ class Session extends React.Component {
         },
       ],
       stepNumber: 0,
-      xIsNext: true,
+      selectedMed: bottles[0],
       rows: rows,
       cols: cols,
     };
   }
 
   handleClick(i) {
+    // Square click handler
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
-    squares[i] = this.state.xIsNext ? "X" : "O";
+    squares[i] = this.state.selectedMed;
     this.setState({
       history: history.concat([
         {
-          squares: squares,
+          squares: squares, // this will be a count by med
+          selectedMed: this.state.selectedMed,
         },
       ]),
       stepNumber: history.length,
-      xIsNext: !this.state.xIsNext,
     });
   }
 
   jumpTo(step) {
     this.setState({
       stepNumber: step,
-      xIsNext: step % 2 === 0,
+      selectedMed: this.state.history[step].selectedMed,
     });
   }
 
@@ -102,7 +104,7 @@ class Session extends React.Component {
     if (winner) {
       status = "Your pill have been correctly organized!";
     } else {
-      status = "Selected Medication: " + (this.state.xIsNext ? "X" : "O");
+      status = "Selected Medication: " + this.state.selectedMed;
     }
 
     return (
