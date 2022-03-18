@@ -54,8 +54,9 @@ class Session extends React.Component {
     const squares = [];
     for (let i = 0; i < this.props.rows * this.props.cols; i++) {
       let counts = {};
-      this.props.bottles.forEach((med) => {
-        counts[med] = 0;
+      this.props.medications.forEach((med) => {
+        // Would be better to use a medication int PK. This prevent name edit
+        counts[med.name] = 0;
       });
       squares.push(counts);
     }
@@ -63,12 +64,12 @@ class Session extends React.Component {
       history: [
         {
           squares: squares,
-          selectedMed: this.props.bottles[0],
+          selectedMed: this.props.medications[0].name,
         },
       ],
       stepNumber: 0,
-      medOptions: this.props.bottles,
-      selectedMed: this.props.bottles[0],
+      medOptions: this.props.medications,
+      selectedMed: this.props.medications[0].name,
       cols: this.props.cols,
     };
   }
@@ -130,11 +131,14 @@ class Session extends React.Component {
       status = "Selected Medication: " + this.state.selectedMed;
     }
     const medOptions = this.state.medOptions.map((i, j) => {
-      const className = this.state.selectedMed === i ? "active" : "";
+      const className = this.state.selectedMed === i.name ? "active" : "";
       return (
         <li key={j}>
-          <button className={className} onClick={() => this.setMedication(i)}>
-            {i}
+          <button
+            className={className}
+            onClick={() => this.setMedication(i.name)}
+          >
+            {i.name}
           </button>
         </li>
       );
@@ -171,11 +175,48 @@ class Session extends React.Component {
   }
 }
 
+function Medication(props) {
+  return (
+    <div>
+      <label>
+        Name
+        <input
+          type="text"
+          name="name"
+          maxLength="100"
+          onChange={(e) => props.handleMedChange(e, props.medIdx)}
+          required
+          value={props.name}
+        />
+      </label>
+      <label>
+        Instructions
+        <textarea
+          name="instructions"
+          onChange={(e) => props.handleMedChange(e, props.medIdx)}
+          value={props.instructions}
+        ></textarea>
+      </label>
+    </div>
+  );
+}
+
 class SessionConfig extends React.Component {
   render() {
+    const medications = this.props.medications.map((med, i) => {
+      return (
+        <Medication
+          key={i}
+          medIdx={i}
+          name={med.name}
+          instructions={med.instructions}
+          handleMedChange={(e, i) => this.props.handleMedChange(e, i)}
+        />
+      );
+    });
     return (
       <div>
-        <h2>Configuration</h2>
+        <h2>Session Configuration</h2>
         <input
           value={this.props.rows}
           onChange={this.props.onRowChange}
@@ -183,6 +224,11 @@ class SessionConfig extends React.Component {
           min="1"
           max="4"
         ></input>
+        <h3>Medications</h3>
+        <div>{medications}</div>
+        <button onClick={() => this.props.clickAddMedication()} type="button">
+          Add Medication
+        </button>
       </div>
     );
   }
@@ -194,8 +240,10 @@ class OverLord extends React.Component {
   // - instruction changes
   constructor(props) {
     super(props);
+    this.newMedication = { name: "", instructions: "" };
     this.state = {
       rows: 2,
+      medications: [Object.create(this.newMedication)],
     };
   }
   setRows(rowCt) {
@@ -204,8 +252,26 @@ class OverLord extends React.Component {
     });
   }
 
+  clickAddMedication() {
+    const meds = this.state.medications.slice();
+    this.setState({
+      medications: meds.concat([Object.create(this.newMedication)]),
+    });
+  }
+
+  handleMedChange(event, medKey) {
+    const target = event.target;
+    const value = target.type === "checkbox" ? target.checked : target.value;
+    const name = target.name;
+    const meds = this.state.medications.slice();
+    // use they key to edit the right medication
+    meds[medKey][name] = value;
+    this.setState({
+      medications: meds,
+    });
+  }
+
   render() {
-    const bottles = ["Ty", "Crestor"];
     const days = [
       { name: "Sunday", abbr: "Sun" },
       { name: "Monday", abbr: "Mon" },
@@ -225,11 +291,14 @@ class OverLord extends React.Component {
           key={this.state.rows}
           cols={days.length}
           header={days.map((day) => day.abbr)}
-          bottles={bottles}
+          medications={this.state.medications}
         />
         <SessionConfig
           rows={this.state.rows}
           onRowChange={(i) => this.setRows(i)}
+          clickAddMedication={(i) => this.clickAddMedication(i)}
+          medications={this.state.medications}
+          handleMedChange={(e, k) => this.handleMedChange(e, k)}
         />
       </div>
     );
