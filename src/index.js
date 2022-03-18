@@ -69,7 +69,6 @@ class Session extends React.Component {
       stepNumber: 0,
       medOptions: this.props.bottles,
       selectedMed: this.props.bottles[0],
-      rows: this.props.rows,
       cols: this.props.cols,
     };
   }
@@ -131,7 +130,7 @@ class Session extends React.Component {
       status = "Selected Medication: " + this.state.selectedMed;
     }
     const medOptions = this.state.medOptions.map((i, j) => {
-      const className = this.state.selectedMed == i ? "active" : "";
+      const className = this.state.selectedMed === i ? "active" : "";
       return (
         <li key={j}>
           <button className={className} onClick={() => this.setMedication(i)}>
@@ -155,7 +154,7 @@ class Session extends React.Component {
           <Organizer
             squares={current.squares}
             onClick={(i) => this.handleClick(i)}
-            rows={this.state.rows}
+            rows={this.props.rows}
             cols={this.state.cols}
           />
         </div>
@@ -172,12 +171,40 @@ class Session extends React.Component {
   }
 }
 
+class SessionConfig extends React.Component {
+  render() {
+    return (
+      <div>
+        <h2>Configuration</h2>
+        <input
+          value={this.props.rows}
+          onChange={this.props.onRowChange}
+          type="number"
+          min="1"
+          max="4"
+        ></input>
+      </div>
+    );
+  }
+}
+
 class OverLord extends React.Component {
   // Handle modifications to game config here
   // - (row/col changes)
   // - instruction changes
+  constructor(props) {
+    super(props);
+    this.state = {
+      rows: 2,
+    };
+  }
+  setRows(rowCt) {
+    this.setState({
+      rows: parseInt(rowCt.target.value),
+    });
+  }
+
   render() {
-    const rows = 2;
     const bottles = ["Ty", "Crestor"];
     const days = [
       { name: "Sunday", abbr: "Sun" },
@@ -194,10 +221,15 @@ class OverLord extends React.Component {
           <h1>Pill Master 3000</h1>
         </div>
         <Session
-          rows={rows}
+          rows={this.state.rows}
+          key={this.state.rows}
           cols={days.length}
           header={days.map((day) => day.abbr)}
           bottles={bottles}
+        />
+        <SessionConfig
+          rows={this.state.rows}
+          onRowChange={(i) => this.setRows(i)}
         />
       </div>
     );
