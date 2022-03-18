@@ -55,7 +55,7 @@ class Session extends React.Component {
     for (let i = 0; i < this.props.rows * this.props.cols; i++) {
       let counts = {};
       this.props.medications.forEach((med) => {
-        // Would be better to use a medication int PK. This prevent name edit
+        // TODO: Would be better to use a medication int PK. This prevent name edit
         counts[med.name] = 0;
       });
       squares.push(counts);
@@ -244,12 +244,21 @@ class OverLord extends React.Component {
     this.state = {
       rows: 2,
       medications: [Object.create(this.newMedication)],
+      sessionKey: 0,
     };
   }
+
+  incrementSessionKey() {
+    this.setState((prevState) => {
+      return { sessionKey: prevState.sessionKey + 1 };
+    });
+  }
+
   setRows(rowCt) {
     this.setState({
       rows: parseInt(rowCt.target.value),
     });
+    this.incrementSessionKey();
   }
 
   clickAddMedication() {
@@ -257,6 +266,7 @@ class OverLord extends React.Component {
     this.setState({
       medications: meds.concat([Object.create(this.newMedication)]),
     });
+    this.incrementSessionKey();
   }
 
   handleMedChange(event, medKey) {
@@ -269,6 +279,7 @@ class OverLord extends React.Component {
     this.setState({
       medications: meds,
     });
+    this.incrementSessionKey();
   }
 
   render() {
@@ -288,7 +299,7 @@ class OverLord extends React.Component {
         </div>
         <Session
           rows={this.state.rows}
-          key={this.state.rows}
+          key={this.state.sessionKey}
           cols={days.length}
           header={days.map((day) => day.abbr)}
           medications={this.state.medications}
