@@ -64,12 +64,12 @@ class Session extends React.Component {
       history: [
         {
           squares: squares,
-          selectedMed: this.props.medications[0].name,
+          selectedMed: this.props.medications[0],
         },
       ],
       stepNumber: 0,
       medOptions: this.props.medications,
-      selectedMed: this.props.medications[0].name,
+      selectedMed: this.props.medications[0],
       cols: this.props.cols,
     };
   }
@@ -84,7 +84,7 @@ class Session extends React.Component {
     }
     // slice only creates a shallow copy of the squares, not the squares' counts
     const newCount = Object.create(squares[i]);
-    newCount[this.state.selectedMed]++;
+    newCount[this.state.selectedMed.name]++;
     squares[i] = newCount;
     this.setState({
       history: history.concat([
@@ -128,16 +128,13 @@ class Session extends React.Component {
     if (winner) {
       status = "Your pills have been correctly organized!";
     } else {
-      status = "Selected Medication: " + this.state.selectedMed;
+      status = "Selected Medication: " + this.state.selectedMed.name;
     }
     const medOptions = this.state.medOptions.map((i, j) => {
-      const className = this.state.selectedMed === i.name ? "active" : "";
+      const className = this.state.selectedMed.name === i.name ? "active" : "";
       return (
         <li key={j}>
-          <button
-            className={className}
-            onClick={() => this.setMedication(i.name)}
-          >
+          <button className={className} onClick={() => this.setMedication(i)}>
             {i.name}
           </button>
         </li>
@@ -168,6 +165,7 @@ class Session extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
+          <h3>History</h3>
           <ol>{moves}</ol>
         </div>
       </div>
