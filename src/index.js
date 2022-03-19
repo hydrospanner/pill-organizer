@@ -315,7 +315,12 @@ class OverLord extends React.Component {
 }
 // ========================================
 
-ReactDOM.render(<OverLord />, document.getElementById("root"));
+ReactDOM.render(
+  <React.StrictMode>
+    <OverLord />
+  </React.StrictMode>,
+  document.getElementById("root")
+);
 
 function calculateWinner(squares) {
   // no winner yet
