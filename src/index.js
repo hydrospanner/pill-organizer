@@ -113,7 +113,6 @@ class Session extends React.Component {
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
-    const winner = calculateWinner(current.squares);
 
     const moves = history.map((step, move) => {
       const desc = move ? "Go to move #" + move : "Go to session start";
@@ -124,12 +123,6 @@ class Session extends React.Component {
       );
     });
 
-    let status;
-    if (winner) {
-      status = "Your pills have been correctly organized!";
-    } else {
-      status = "Selected Medication: " + this.state.selectedMed.name;
-    }
     const medOptions = this.state.medOptions.map((i, j) => {
       const className = this.state.selectedMed.name === i.name ? "active" : "";
       return (
@@ -164,7 +157,9 @@ class Session extends React.Component {
           <ul>{medOptions}</ul>
         </div>
         <div className="game-info">
-          <div>{status}</div>
+          <h3>{this.state.selectedMed.name}</h3>
+          <h4>Instructions</h4>
+          <div>{this.state.selectedMed.instructions}</div>
           <h3>History</h3>
           <ol>{moves}</ol>
         </div>
