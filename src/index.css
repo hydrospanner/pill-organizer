@@ -3,6 +3,10 @@ body {
   margin: 20px;
 }
 
+h1 {
+  text-align: center;
+}
+
 ol,
 ul {
   padding-left: 30px;
@@ -50,4 +54,8 @@ ul {
   display: inline-flex;
   width: 14.28%;
   justify-content: center;
+}
+
+.medication-form {
+  margin-left: 30px;
 }

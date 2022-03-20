@@ -2,6 +2,10 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
+import Button from "react-bootstrap/Button";
+import { ButtonGroup, ToggleButton, Row, Col, Form } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+
 function Square(props) {
   const display = [];
   for (const name in props.value) {
@@ -118,19 +122,24 @@ class Session extends React.Component {
       const desc = move ? "Go to move #" + move : "Go to session start";
       return (
         <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          <Button variant="outline-secondary" onClick={() => this.jumpTo(move)}>
+            {desc}
+          </Button>
         </li>
       );
     });
 
     const medOptions = this.state.medOptions.map((i, j) => {
-      const className = this.state.selectedMed.name === i.name ? "active" : "";
       return (
-        <li key={j}>
-          <button className={className} onClick={() => this.setMedication(i)}>
-            {i.name}
-          </button>
-        </li>
+        <ToggleButton
+          key={j}
+          variant="outline-info"
+          type="radio"
+          onClick={() => this.setMedication(i)}
+          checked={this.state.selectedMed.name === i.name}
+        >
+          {i.name}
+        </ToggleButton>
       );
     });
     const header = this.props.header.map((day, i) => {
@@ -152,14 +161,20 @@ class Session extends React.Component {
             cols={this.state.cols}
           />
         </div>
-        <div className="med-selection">
-          <h5>Select Medication</h5>
-          <ul>{medOptions}</ul>
-        </div>
+        <Row>
+          <Col md>
+            <div className="med-selection">
+              <h5>Select Medication</h5>
+              <ButtonGroup vertical>{medOptions}</ButtonGroup>
+            </div>
+          </Col>
+          <Col md>
+            <h3>{this.state.selectedMed.name}</h3>
+            <h4>Instructions</h4>
+            <div>{this.state.selectedMed.instructions}</div>
+          </Col>
+        </Row>
         <div className="game-info">
-          <h3>{this.state.selectedMed.name}</h3>
-          <h4>Instructions</h4>
-          <div>{this.state.selectedMed.instructions}</div>
           <h3>History</h3>
           <ol>{moves}</ol>
         </div>
@@ -170,26 +185,27 @@ class Session extends React.Component {
 
 function Medication(props) {
   return (
-    <div>
-      <label>
-        Name
-        <input
+    <div className="medication-form">
+      <Form.Group className="mb-2">
+        <Form.Label>Name</Form.Label>
+        <Form.Control
           type="text"
           name="name"
-          maxLength="100"
+          maxLength="80"
           onChange={(e) => props.handleMedChange(e, props.medIdx)}
           required
           value={props.name}
         />
-      </label>
-      <label>
-        Instructions
-        <textarea
+      </Form.Group>
+      <Form.Group className="mb-2">
+        <Form.Label>Instructions</Form.Label>
+        <Form.Control
+          as="textarea"
           name="instructions"
           onChange={(e) => props.handleMedChange(e, props.medIdx)}
           value={props.instructions}
-        ></textarea>
-      </label>
+        />
+      </Form.Group>
     </div>
   );
 }
@@ -209,19 +225,25 @@ class SessionConfig extends React.Component {
     });
     return (
       <div>
-        <h2>Session Configuration</h2>
-        <input
-          value={this.props.rows}
-          onChange={this.props.onRowChange}
-          type="number"
-          min="1"
-          max="4"
-        ></input>
-        <h3>Medications</h3>
-        <div>{medications}</div>
-        <button onClick={() => this.props.clickAddMedication()} type="button">
-          Add Medication
-        </button>
+        <Form>
+          <h2>Session Configuration</h2>
+          <input
+            value={this.props.rows}
+            onChange={this.props.onRowChange}
+            type="number"
+            min="1"
+            max="4"
+          ></input>
+          <h3>Medications</h3>
+          <div>{medications}</div>
+          <Button
+            onClick={() => this.props.clickAddMedication()}
+            type="Button"
+            variant="secondary"
+          >
+            Add Medication
+          </Button>
+        </Form>
       </div>
     );
   }
@@ -286,7 +308,7 @@ class OverLord extends React.Component {
       { name: "Saturday", abbr: "Sat" },
     ];
     return (
-      <div>
+      <div className="container">
         <div>
           <h1>Pill Master 3000</h1>
         </div>
