@@ -76,6 +76,9 @@ ul {
 .board-row.night button {
   background-color: #3fd2ff;
 }
+.board-row.bed button {
+  background-color: lightgray;
+}
 
 .board-row button {
   opacity: 0.9;

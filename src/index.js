@@ -22,6 +22,7 @@ const orgRow = {
   morning: { name: "Morning", icon: "fa-mug-saucer", className: "morning" },
   day: { name: "Noon", icon: "fa-sun", className: "noon" },
   night: { name: "Night", icon: "fa-moon", className: "night" },
+  bed: { name: "Bed", icon: "fa-bed", className: "bed" },
 };
 const organizerModes = [
   { name: "Simple", rows: [orgRow.day] },
@@ -29,6 +30,10 @@ const organizerModes = [
   {
     name: "Morning/Noon/Night",
     rows: [orgRow.morning, orgRow.day, orgRow.night],
+  },
+  {
+    name: "Morning/Noon/Night/Bed",
+    rows: [orgRow.morning, orgRow.day, orgRow.night, orgRow.bed],
   },
 ];
 
@@ -215,6 +220,49 @@ class Session extends React.Component {
   }
 }
 
+function MedicationRule(props) {
+  // Rule for how the medication is to be taken.
+  const timeOpts = props.organizerMode.rows.map((row, i) => {
+    return (
+      <Form.Check
+        type="checkbox"
+        label={row.name}
+        key={i}
+        id={`med-rule-${props.medIdx}-${props.ruleIdx}-${i}`}
+      />
+    );
+  });
+
+  return (
+    <div className="medication-rule">
+      <Row>
+        <Col xs={4}>
+          <Form.Group className="mb-2">
+            <Form.Label>Take</Form.Label>
+            <Form.Control
+              value={props.take}
+              type="number"
+              name="take"
+              min={0}
+              onChange={(e) =>
+                props.handleMedRuleChange(e, props.medIdx, props.ruleIdx)
+              }
+              required
+            />
+          </Form.Group>
+        </Col>
+        <Col xs={4}>
+          <Form.Check type="checkbox" label="Daily" checked={true} disabled />
+        </Col>
+        <Col xs={4}>
+          at
+          {timeOpts}
+        </Col>
+      </Row>
+    </div>
+  );
+}
+
 function Medication(props) {
   let deleteBtn = "";
   if (props.medIdx !== 0) {
@@ -229,6 +277,20 @@ function Medication(props) {
       </Button>
     );
   }
+  const rules = props.med.rules.map((rule, i) => {
+    return (
+      <MedicationRule
+        take={rule.take}
+        key={i}
+        ruleIdx={i}
+        medIdx={props.medIdx}
+        organizerMode={props.organizerMode}
+        handleMedRuleChange={(e, mk, rk) =>
+          props.handleMedRuleChange(e, mk, rk)
+        }
+      />
+    );
+  });
   return (
     <div className="medication-form">
       <Row>
@@ -241,7 +303,7 @@ function Medication(props) {
               maxLength="50"
               onChange={(e) => props.handleMedChange(e, props.medIdx)}
               required
-              value={props.name}
+              value={props.med.name}
             />
           </Form.Group>
         </Col>
@@ -253,9 +315,10 @@ function Medication(props) {
           as="textarea"
           name="instructions"
           onChange={(e) => props.handleMedChange(e, props.medIdx)}
-          value={props.instructions}
+          value={props.med.instructions}
         />
       </Form.Group>
+      <div>{rules}</div>
     </div>
   );
 }
@@ -267,10 +330,13 @@ class SessionConfig extends React.Component {
         <Medication
           key={i}
           medIdx={i}
-          name={med.name}
-          instructions={med.instructions}
+          med={med}
+          organizerMode={this.props.organizerMode}
           handleMedChange={(e, i) => this.props.handleMedChange(e, i)}
           handleMedDelete={(e, i) => this.props.handleMedDelete(e, i)}
+          handleMedRuleChange={(e, mk, rk) =>
+            this.props.handleMedRuleChange(e, mk, rk)
+          }
         />
       );
     });
@@ -316,7 +382,12 @@ class OverLord extends React.Component {
   // - instruction changes
   constructor(props) {
     super(props);
-    this.newMedication = { name: "", instructions: "" };
+    this.newRule = { take: 1 };
+    this.newMedication = {
+      name: "",
+      instructions: "",
+      rules: [Object.create(this.newRule)],
+    };
     this.state = {
       organizerMode: organizerModes[2],
       medications: [Object.create(this.newMedication)],
@@ -352,6 +423,19 @@ class OverLord extends React.Component {
     const meds = this.state.medications.slice();
     // use they key to edit the right medication
     meds[medKey][name] = value;
+    this.setState({
+      medications: meds,
+    });
+    this.incrementSessionKey();
+  }
+
+  handleMedRuleChange(event, medKey, ruleKey) {
+    const target = event.target;
+    const value = target.type === "checkbox" ? target.checked : target.value;
+    const name = target.name;
+    const meds = this.state.medications.slice();
+    // const rules = meds[medKey].rules.slice();
+    meds[medKey].rules[ruleKey][name] = value;
     this.setState({
       medications: meds,
     });
@@ -397,6 +481,9 @@ class OverLord extends React.Component {
           organizerMode={this.state.organizerMode}
           handleMedChange={(e, k) => this.handleMedChange(e, k)}
           handleMedDelete={(e, k) => this.handleMedDelete(e, k)}
+          handleMedRuleChange={(e, mk, rk) =>
+            this.handleMedRuleChange(e, mk, rk)
+          }
         />
       </div>
     );
