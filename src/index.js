@@ -18,6 +18,20 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 library.add(faMugSaucer, faSun, faMoon, faTrash, faPills);
 
+const orgRow = {
+  morning: { name: "Morning", icon: "fa-mug-saucer", className: "morning" },
+  day: { name: "Noon", icon: "fa-sun", className: "noon" },
+  night: { name: "Night", icon: "fa-moon", className: "night" },
+};
+const organizerModes = [
+  { name: "Simple", rows: [orgRow.day] },
+  { name: "Morning/Night", rows: [orgRow.morning, orgRow.night] },
+  {
+    name: "Morning/Noon/Night",
+    rows: [orgRow.morning, orgRow.day, orgRow.night],
+  },
+];
+
 function Square(props) {
   const display = [];
   for (const name in props.value) {
@@ -25,6 +39,7 @@ function Square(props) {
       display.push(`${name}: ${props.value[name]}`);
     }
   }
+  // display count of each medication in row
   const rows = display.map((txt, i) => {
     return <div key={i}>{txt}</div>;
   });
@@ -48,17 +63,17 @@ class Organizer extends React.Component {
 
   render() {
     let squares = [];
-    for (let rowIdx = 0; rowIdx < this.props.rows; rowIdx++) {
+    this.props.organizerMode.rows.forEach((orgRow, rowIdx) => {
       let row = [];
       for (let colIdx = 0; colIdx < this.props.cols; colIdx++) {
         row.push(this.renderSquare(colIdx + rowIdx * this.props.cols));
       }
       squares.push(
-        <div key={rowIdx} className="board-row">
+        <div key={rowIdx} className={`board-row ${orgRow.className}`}>
           {row}
         </div>
       );
-    }
+    });
     return <div>{squares}</div>;
   }
 }
@@ -67,8 +82,13 @@ class Session extends React.Component {
   // Session trying to match fulfill pill instructions
   constructor(props) {
     super(props);
+    // create mapping of pill counts per Organizer square
     const squares = [];
-    for (let i = 0; i < this.props.rows * this.props.cols; i++) {
+    for (
+      let i = 0;
+      i < this.props.organizerMode.rows.length * this.props.cols;
+      i++
+    ) {
       let counts = {};
       this.props.medications.forEach((med) => {
         // TODO: Would be better to use a medication int PK. This prevent name edit
@@ -169,7 +189,7 @@ class Session extends React.Component {
           <Organizer
             squares={current.squares}
             onClick={(i) => this.handleClick(i)}
-            rows={this.props.rows}
+            organizerMode={this.props.organizerMode}
             cols={this.state.cols}
           />
         </div>
@@ -218,7 +238,7 @@ function Medication(props) {
             <Form.Control
               type="text"
               name="name"
-              maxLength="80"
+              maxLength="50"
               onChange={(e) => props.handleMedChange(e, props.medIdx)}
               required
               value={props.name}
@@ -254,20 +274,26 @@ class SessionConfig extends React.Component {
         />
       );
     });
+    const organizerOpts = organizerModes.map((opt, i) => {
+      return (
+        <Form.Check
+          type="radio"
+          name="organizer"
+          label={opt.name}
+          key={i}
+          value={i}
+          id={`org-opt-${i}`}
+          onChange={(e) => this.props.onOrgModeChange(e)}
+          checked={opt.name === this.props.organizerMode.name}
+        />
+      );
+    });
     return (
       <div>
         <Form>
           <h2>Session Configuration</h2>
-          <label>
-            Rows
-            <input
-              value={this.props.rows}
-              onChange={this.props.onRowChange}
-              type="number"
-              min="1"
-              max="4"
-            ></input>
-          </label>
+          <h3>Organizer type</h3>
+          <div>{organizerOpts}</div>
           <h3>Medications</h3>
           <div>{medications}</div>
           <Button
@@ -292,7 +318,7 @@ class OverLord extends React.Component {
     super(props);
     this.newMedication = { name: "", instructions: "" };
     this.state = {
-      rows: 2,
+      organizerMode: organizerModes[0],
       medications: [Object.create(this.newMedication)],
       sessionKey: 0,
     };
@@ -304,9 +330,9 @@ class OverLord extends React.Component {
     });
   }
 
-  setRows(rowCt) {
+  setOrganizerMode(e) {
     this.setState({
-      rows: parseInt(rowCt.target.value),
+      organizerMode: organizerModes[parseInt(e.target.value)],
     });
     this.incrementSessionKey();
   }
@@ -357,17 +383,18 @@ class OverLord extends React.Component {
           <h1>Pill Master 3000</h1>
         </div>
         <Session
-          rows={this.state.rows}
+          organizerMode={this.state.organizerMode}
           key={this.state.sessionKey}
           cols={days.length}
           header={days.map((day) => day.abbr)}
           medications={this.state.medications}
         />
         <SessionConfig
-          rows={this.state.rows}
           onRowChange={(i) => this.setRows(i)}
+          onOrgModeChange={(e) => this.setOrganizerMode(e)}
           clickAddMedication={(i) => this.clickAddMedication(i)}
           medications={this.state.medications}
+          organizerMode={this.state.organizerMode}
           handleMedChange={(e, k) => this.handleMedChange(e, k)}
           handleMedDelete={(e, k) => this.handleMedDelete(e, k)}
         />
