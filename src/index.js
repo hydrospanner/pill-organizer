@@ -196,19 +196,37 @@ class Session extends React.Component {
 }
 
 function Medication(props) {
+  let deleteBtn = "";
+  if (props.medIdx !== 0) {
+    // at least one medication is needed
+    deleteBtn = (
+      <Button
+        variant="outline-danger"
+        className="delete"
+        onClick={(e) => props.handleMedDelete(e, props.medIdx)}
+      >
+        <FontAwesomeIcon icon="fa-solid fa-trash" />
+      </Button>
+    );
+  }
   return (
     <div className="medication-form">
-      <Form.Group className="mb-2">
-        <Form.Label>Name</Form.Label>
-        <Form.Control
-          type="text"
-          name="name"
-          maxLength="80"
-          onChange={(e) => props.handleMedChange(e, props.medIdx)}
-          required
-          value={props.name}
-        />
-      </Form.Group>
+      <Row>
+        <Col xs={10}>
+          <Form.Group className="mb-2">
+            <Form.Label>Name</Form.Label>
+            <Form.Control
+              type="text"
+              name="name"
+              maxLength="80"
+              onChange={(e) => props.handleMedChange(e, props.medIdx)}
+              required
+              value={props.name}
+            />
+          </Form.Group>
+        </Col>
+        <Col xs={2}>{deleteBtn}</Col>
+      </Row>
       <Form.Group className="mb-2">
         <Form.Label>Instructions</Form.Label>
         <Form.Control
@@ -232,6 +250,7 @@ class SessionConfig extends React.Component {
           name={med.name}
           instructions={med.instructions}
           handleMedChange={(e, i) => this.props.handleMedChange(e, i)}
+          handleMedDelete={(e, i) => this.props.handleMedDelete(e, i)}
         />
       );
     });
@@ -239,13 +258,16 @@ class SessionConfig extends React.Component {
       <div>
         <Form>
           <h2>Session Configuration</h2>
-          <input
-            value={this.props.rows}
-            onChange={this.props.onRowChange}
-            type="number"
-            min="1"
-            max="4"
-          ></input>
+          <label>
+            Rows
+            <input
+              value={this.props.rows}
+              onChange={this.props.onRowChange}
+              type="number"
+              min="1"
+              max="4"
+            ></input>
+          </label>
           <h3>Medications</h3>
           <div>{medications}</div>
           <Button
@@ -310,6 +332,15 @@ class OverLord extends React.Component {
     this.incrementSessionKey();
   }
 
+  handleMedDelete(event, medKey) {
+    const meds = this.state.medications.slice();
+    meds.splice(medKey, 1);
+    this.setState({
+      medications: meds,
+    });
+    this.incrementSessionKey();
+  }
+
   render() {
     const days = [
       { name: "Sunday", abbr: "Sun" },
@@ -338,6 +369,7 @@ class OverLord extends React.Component {
           clickAddMedication={(i) => this.clickAddMedication(i)}
           medications={this.state.medications}
           handleMedChange={(e, k) => this.handleMedChange(e, k)}
+          handleMedDelete={(e, k) => this.handleMedDelete(e, k)}
         />
       </div>
     );
