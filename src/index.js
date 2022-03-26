@@ -2,9 +2,21 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
+import { library } from "@fortawesome/fontawesome-svg-core";
+import {
+  faMugSaucer,
+  faSun,
+  faMoon,
+  faTrash,
+  faPills,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import Button from "react-bootstrap/Button";
 import { ButtonGroup, ToggleButton, Row, Col, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+
+library.add(faMugSaucer, faSun, faMoon, faTrash, faPills);
 
 function Square(props) {
   const display = [];
@@ -242,6 +254,7 @@ class SessionConfig extends React.Component {
             variant="secondary"
           >
             Add Medication
+            <FontAwesomeIcon icon="fa-solid fa-pills" />
           </Button>
         </Form>
       </div>

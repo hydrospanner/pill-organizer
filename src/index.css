@@ -58,4 +58,8 @@ ul {
 
 .medication-form {
   margin-left: 30px;
+  margin-bottom: 0.5rem;
+  border: 0.2rem solid #ececec;
+  border-radius: 8px;
+  padding: 1rem;
 }
