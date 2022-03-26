@@ -66,3 +66,17 @@ ul {
 .medication-form button.delete {
   float: right;
 }
+
+.board-row.morning button {
+  background-color: #fffc3f;
+}
+.board-row.noon button {
+  background-color: #ff8383;
+}
+.board-row.night button {
+  background-color: #3fd2ff;
+}
+
+.board-row button {
+  opacity: 0.9;
+}

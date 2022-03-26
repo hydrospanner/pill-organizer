@@ -318,7 +318,7 @@ class OverLord extends React.Component {
     super(props);
     this.newMedication = { name: "", instructions: "" };
     this.state = {
-      organizerMode: organizerModes[0],
+      organizerMode: organizerModes[2],
       medications: [Object.create(this.newMedication)],
       sessionKey: 0,
     };
