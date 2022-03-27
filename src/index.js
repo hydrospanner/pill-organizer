@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
+import cloneDeep from "lodash/cloneDeep";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faMugSaucer,
@@ -120,10 +121,9 @@ class Session extends React.Component {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
-    if (calculateWinner(squares) || squares[i]) {
+    if (calculateWinner(squares, this.props.medications)) {
       // return;
     }
-    // slice only creates a shallow copy of the squares, not the squares' counts
     const newCount = Object.create(squares[i]);
     newCount[this.state.selectedMed.name]++;
     squares[i] = newCount;
@@ -227,6 +227,10 @@ function MedicationRule(props) {
       <Form.Check
         type="checkbox"
         label={row.name}
+        name={row.name}
+        onChange={(e) =>
+          props.handleMedRuleChange(e, props.medIdx, props.ruleIdx)
+        }
         key={i}
         id={`med-rule-${props.medIdx}-${props.ruleIdx}-${i}`}
       />
@@ -409,7 +413,7 @@ class OverLord extends React.Component {
   }
 
   clickAddMedication() {
-    const meds = this.state.medications.slice();
+    const meds = cloneDeep(this.state.medications);
     this.setState({
       medications: meds.concat([Object.create(this.newMedication)]),
     });
@@ -420,7 +424,7 @@ class OverLord extends React.Component {
     const target = event.target;
     const value = target.type === "checkbox" ? target.checked : target.value;
     const name = target.name;
-    const meds = this.state.medications.slice();
+    const meds = cloneDeep(this.state.medications);
     // use they key to edit the right medication
     meds[medKey][name] = value;
     this.setState({
@@ -433,8 +437,7 @@ class OverLord extends React.Component {
     const target = event.target;
     const value = target.type === "checkbox" ? target.checked : target.value;
     const name = target.name;
-    const meds = this.state.medications.slice();
-    // const rules = meds[medKey].rules.slice();
+    const meds = cloneDeep(this.state.medications);
     meds[medKey].rules[ruleKey][name] = value;
     this.setState({
       medications: meds,
@@ -443,7 +446,7 @@ class OverLord extends React.Component {
   }
 
   handleMedDelete(event, medKey) {
-    const meds = this.state.medications.slice();
+    const meds = cloneDeep(this.state.medications);
     meds.splice(medKey, 1);
     this.setState({
       medications: meds,
@@ -498,8 +501,19 @@ ReactDOM.render(
   document.getElementById("root")
 );
 
-function calculateWinner(squares) {
+function calculateWinner(squares, medications) {
+  // any changes to medications should only be done once (outside this func,
+  // when Session is created)
+  console.log(squares);
+  console.log(medications);
+  medications.forEach((med, i) => {
+    console.log(med.name);
+    console.log(med.rules[0]);
+  });
   // no winner yet
   // TODO: determine if pill org instructions have been met for all percriptions
+  // If I had the board organized as {med: {row.name: [each cell's count]}
+  // , then I could simply added the array together and compare it to the row's take * 7.
+  // This doesn't need to flag which cell is wrong (yet)
   return null;
 }
