@@ -37,12 +37,21 @@ const organizerModes = [
     rows: [orgRow.morning, orgRow.day, orgRow.night, orgRow.bed],
   },
 ];
+const days = [
+  { name: "Sunday", abbr: "Sun" },
+  { name: "Monday", abbr: "Mon" },
+  { name: "Tuesday", abbr: "Tue" },
+  { name: "Wednesday", abbr: "Wed" },
+  { name: "Thursday", abbr: "Thu" },
+  { name: "Friday", abbr: "Fri" },
+  { name: "Saturday", abbr: "Sat" },
+];
 
 function Square(props) {
   const display = [];
-  for (const name in props.value) {
-    if (props.value[name]) {
-      display.push(`${name}: ${props.value[name]}`);
+  for (const name in props.medCounts) {
+    if (props.medCounts[name]) {
+      display.push(`${name}: ${props.medCounts[name]}`);
     }
   }
   // display count of each medication in row
@@ -56,32 +65,38 @@ function Square(props) {
   );
 }
 
-class Organizer extends React.Component {
-  renderSquare(i) {
+function OrganizerRow(props) {
+  const daySquares = days.map((day, colIdx) => {
+    const i = colIdx + props.rowIdx * days.length;
     return (
       <Square
-        value={this.props.squares[i]}
-        onClick={() => this.props.onClick(i)}
-        key={i}
+        medCounts={props.squares[i]}
+        onClick={() => props.onClick(i)}
+        key={`${props.orgRow.name}-${day.abbr}`}
       />
     );
-  }
+  });
+  return (
+    <div key={props.rowIdx} className={`board-row ${props.orgRow.className}`}>
+      {daySquares}
+    </div>
+  );
+}
 
-  render() {
-    let squares = [];
-    this.props.organizerMode.rows.forEach((orgRow, rowIdx) => {
-      let row = [];
-      for (let colIdx = 0; colIdx < this.props.cols; colIdx++) {
-        row.push(this.renderSquare(colIdx + rowIdx * this.props.cols));
-      }
-      squares.push(
-        <div key={rowIdx} className={`board-row ${orgRow.className}`}>
-          {row}
-        </div>
-      );
-    });
-    return <div>{squares}</div>;
-  }
+function Organizer(props) {
+  const rows = props.organizerMode.rows.map((orgRow, rowIdx) => {
+    return (
+      <OrganizerRow
+        squares={props.squares}
+        rowIdx={rowIdx}
+        onClick={(i) => props.onClick(i)}
+        orgRow={orgRow}
+        key={orgRow.name}
+      />
+    );
+  });
+
+  return <div>{rows}</div>;
 }
 
 class Session extends React.Component {
@@ -92,7 +107,7 @@ class Session extends React.Component {
     const squares = [];
     for (
       let i = 0;
-      i < this.props.organizerMode.rows.length * this.props.cols;
+      i < this.props.organizerMode.rows.length * days.length;
       i++
     ) {
       let counts = {};
@@ -112,7 +127,6 @@ class Session extends React.Component {
       stepNumber: 0,
       medOptions: this.props.medications,
       selectedMed: this.props.medications[0],
-      cols: this.props.cols,
     };
   }
 
@@ -195,7 +209,6 @@ class Session extends React.Component {
             squares={current.squares}
             onClick={(i) => this.handleClick(i)}
             organizerMode={this.props.organizerMode}
-            cols={this.state.cols}
           />
         </div>
         <Row>
@@ -248,6 +261,7 @@ function MedicationRule(props) {
               type="number"
               name="take"
               min={0}
+              max={100}
               onChange={(e) =>
                 props.handleMedRuleChange(e, props.medIdx, props.ruleIdx)
               }
@@ -455,15 +469,6 @@ class OverLord extends React.Component {
   }
 
   render() {
-    const days = [
-      { name: "Sunday", abbr: "Sun" },
-      { name: "Monday", abbr: "Mon" },
-      { name: "Tuesday", abbr: "Tue" },
-      { name: "Wednesday", abbr: "Wed" },
-      { name: "Thursday", abbr: "Thu" },
-      { name: "Friday", abbr: "Fri" },
-      { name: "Saturday", abbr: "Sat" },
-    ];
     return (
       <div className="container">
         <div>
@@ -472,7 +477,6 @@ class OverLord extends React.Component {
         <Session
           organizerMode={this.state.organizerMode}
           key={this.state.sessionKey}
-          cols={days.length}
           header={days.map((day) => day.abbr)}
           medications={this.state.medications}
         />
@@ -512,7 +516,8 @@ function calculateWinner(squares, medications) {
   });
   // no winner yet
   // TODO: determine if pill org instructions have been met for all percriptions
-  // If I had the board organized as {med: {row.name: [each cell's count]}
+  // If I had the board organized as
+  // - {med: {row.name: [each cell's count]}
   // , then I could simply added the array together and compare it to the row's take * 7.
   // This doesn't need to flag which cell is wrong (yet)
   return null;
