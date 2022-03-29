@@ -50,8 +50,8 @@ const days = [
 function Square(props) {
   const display = [];
   for (const name in props.medCounts) {
-    if (props.medCounts[name]) {
-      display.push(`${name}: ${props.medCounts[name]}`);
+    if (props.medCounts[name][props.colIdx]) {
+      display.push(`${name}: ${props.medCounts[name][props.colIdx]}`);
     }
   }
   // display count of each medication in row
@@ -59,7 +59,10 @@ function Square(props) {
     return <div key={i}>{txt}</div>;
   });
   return (
-    <button className="square" onClick={props.onClick}>
+    <button
+      className="square"
+      onClick={(e) => props.onClick(props.colIdx, props.orgRow.name)}
+    >
       {rows}
     </button>
   );
@@ -70,8 +73,10 @@ function OrganizerRow(props) {
     const i = colIdx + props.rowIdx * days.length;
     return (
       <Square
-        medCounts={props.squares[i]}
-        onClick={() => props.onClick(i)}
+        colIdx={colIdx}
+        medCounts={props.medCounts[props.orgRow.name]}
+        onClick={(e, n) => props.onClick(e, n)}
+        orgRow={props.orgRow}
         key={`${props.orgRow.name}-${day.abbr}`}
       />
     );
@@ -87,9 +92,9 @@ function Organizer(props) {
   const rows = props.organizerMode.rows.map((orgRow, rowIdx) => {
     return (
       <OrganizerRow
-        squares={props.squares}
+        medCounts={props.medCounts}
         rowIdx={rowIdx}
-        onClick={(i) => props.onClick(i)}
+        onClick={(e, n) => props.onClick(e, n)}
         orgRow={orgRow}
         key={orgRow.name}
       />
@@ -103,25 +108,20 @@ class Session extends React.Component {
   // Session trying to match fulfill pill instructions
   constructor(props) {
     super(props);
-    // create mapping of pill counts per Organizer square
-    const squares = [];
-    for (
-      let i = 0;
-      i < this.props.organizerMode.rows.length * days.length;
-      i++
-    ) {
-      let counts = {};
-      this.props.medications.forEach((med) => {
-        // TODO: Would be better to use a medication int PK. This prevent name edit
-        counts[med.name] = 0;
+    // create mapping of Organizer row to mapping of medication to array of cell counts for the Med.
+    const rowMeds = {};
+    this.props.organizerMode.rows.forEach((row, i) => {
+      const medCounts = {};
+      this.props.medications.forEach((med, medIdx) => {
+        medCounts[med.name] = new Array(days.length).fill(0);
       });
-      squares.push(counts);
-    }
+      rowMeds[row.name] = medCounts;
+    });
     this.state = {
       history: [
         {
-          squares: squares,
           selectedMed: this.props.medications[0],
+          medCounts: rowMeds,
         },
       ],
       stepNumber: 0,
@@ -130,21 +130,19 @@ class Session extends React.Component {
     };
   }
 
-  handleClick(i) {
+  handleClick(i, rowName) {
     // Square click handler (adds a pill to the Square)
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
-    const squares = current.squares.slice();
-    if (calculateWinner(squares, this.props.medications)) {
+    const medCounts = cloneDeep(current.medCounts);
+    medCounts[rowName][this.state.selectedMed.name][i]++;
+    if (calculateWinner(medCounts, this.props.medications)) {
       // return;
     }
-    const newCount = Object.create(squares[i]);
-    newCount[this.state.selectedMed.name]++;
-    squares[i] = newCount;
     this.setState({
       history: history.concat([
         {
-          squares: squares,
+          medCounts: medCounts,
           selectedMed: this.state.selectedMed,
         },
       ]),
@@ -206,8 +204,8 @@ class Session extends React.Component {
         <div className="board-header">{header}</div>
         <div className="game-board">
           <Organizer
-            squares={current.squares}
-            onClick={(i) => this.handleClick(i)}
+            medCounts={current.medCounts}
+            onClick={(e, n) => this.handleClick(e, n)}
             organizerMode={this.props.organizerMode}
           />
         </div>
@@ -449,7 +447,10 @@ class OverLord extends React.Component {
 
   handleMedRuleChange(event, medKey, ruleKey) {
     const target = event.target;
-    const value = target.type === "checkbox" ? target.checked : target.value;
+    let value = target.type === "checkbox" ? target.checked : target.value;
+    if (target.type == "number") {
+      value = parseInt(value);
+    }
     const name = target.name;
     const meds = cloneDeep(this.state.medications);
     meds[medKey].rules[ruleKey][name] = value;
@@ -506,13 +507,22 @@ ReactDOM.render(
 );
 
 function calculateWinner(squares, medications) {
-  // any changes to medications should only be done once (outside this func,
-  // when Session is created)
   console.log(squares);
   console.log(medications);
   medications.forEach((med, i) => {
     console.log(med.name);
     console.log(med.rules[0]);
+
+    for (const rowName in squares) {
+      med.rules.forEach((rule) => {
+        if (rule[rowName]) {
+          // compare the amounts in the squares row for the med to the rule.take
+          console.log(rule.take);
+          console.log(squares[rowName][med.name]);
+        }
+      });
+    }
+    // if medication.name is true, in the rule, count that all counts == take
   });
   // no winner yet
   // TODO: determine if pill org instructions have been met for all percriptions
