@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import "./index.css";
 
 import cloneDeep from "lodash/cloneDeep";
+import isEqual from "lodash/isEqual";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faMugSaucer,
@@ -70,7 +71,6 @@ function Square(props) {
 
 function OrganizerRow(props) {
   const daySquares = days.map((day, colIdx) => {
-    const i = colIdx + props.rowIdx * days.length;
     return (
       <Square
         colIdx={colIdx}
@@ -108,7 +108,8 @@ class Session extends React.Component {
   // Session trying to match fulfill pill instructions
   constructor(props) {
     super(props);
-    // create mapping of Organizer row to mapping of medication to array of cell counts for the Med.
+    // create mapping of Organizer row to mapping of medication to array of
+    // cell counts for the Med.
     const rowMeds = {};
     this.props.organizerMode.rows.forEach((row, i) => {
       const medCounts = {};
@@ -136,14 +137,13 @@ class Session extends React.Component {
     const current = history[history.length - 1];
     const medCounts = cloneDeep(current.medCounts);
     medCounts[rowName][this.state.selectedMed.name][i]++;
-    if (calculateWinner(medCounts, this.props.medications)) {
-      // return;
-    }
+    const compliance = determineCompliance(medCounts, this.props.medications);
     this.setState({
       history: history.concat([
         {
           medCounts: medCounts,
           selectedMed: this.state.selectedMed,
+          compliance: compliance,
         },
       ]),
       stepNumber: history.length,
@@ -169,9 +169,21 @@ class Session extends React.Component {
 
     const moves = history.map((step, move) => {
       const desc = move ? "Go to move #" + move : "Go to session start";
+      let btnContext = "secondary";
+      if (!move) {
+        // doesn't have compliance object
+      } else if (step.compliance.met) {
+        btnContext = "success";
+      } else if (step.compliance.exceeded) {
+        btnContext = "danger";
+      }
+
       return (
         <li key={move}>
-          <Button variant="outline-secondary" onClick={() => this.jumpTo(move)}>
+          <Button
+            variant={`outline-${btnContext}`}
+            onClick={() => this.jumpTo(move)}
+          >
             {desc}
           </Button>
         </li>
@@ -448,7 +460,7 @@ class OverLord extends React.Component {
   handleMedRuleChange(event, medKey, ruleKey) {
     const target = event.target;
     let value = target.type === "checkbox" ? target.checked : target.value;
-    if (target.type == "number") {
+    if (target.type === "number") {
       value = parseInt(value);
     }
     const name = target.name;
@@ -506,29 +518,34 @@ ReactDOM.render(
   document.getElementById("root")
 );
 
-function calculateWinner(squares, medications) {
-  console.log(squares);
-  console.log(medications);
+/** Determine Organizer rule compliance.
+ *
+ * Returns: object indicating med exceeded (failure), under (in progress),
+ * or rules met (success)
+ */
+function determineCompliance(squares, medications) {
+  const compliance = { met: true, exceeded: false };
   medications.forEach((med, i) => {
-    console.log(med.name);
-    console.log(med.rules[0]);
-
     for (const rowName in squares) {
       med.rules.forEach((rule) => {
+        let dailyTake;
         if (rule[rowName]) {
           // compare the amounts in the squares row for the med to the rule.take
-          console.log(rule.take);
-          console.log(squares[rowName][med.name]);
+          dailyTake = rule.take;
+        } else {
+          dailyTake = 0;
         }
+        const correctAmt = new Array(days.length).fill(dailyTake);
+        compliance.met =
+          compliance.met && isEqual(squares[rowName][med.name], correctAmt);
+        const rowTot = squares[rowName][med.name].reduce(
+          (partialSum, a) => partialSum + a,
+          0
+        );
+        compliance.exceeded =
+          compliance.exceeded || rowTot > dailyTake * days.length;
       });
     }
-    // if medication.name is true, in the rule, count that all counts == take
   });
-  // no winner yet
-  // TODO: determine if pill org instructions have been met for all percriptions
-  // If I had the board organized as
-  // - {med: {row.name: [each cell's count]}
-  // , then I could simply added the array together and compare it to the row's take * 7.
-  // This doesn't need to flag which cell is wrong (yet)
-  return null;
+  return compliance;
 }
