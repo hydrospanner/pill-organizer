@@ -131,6 +131,11 @@ class Session extends React.Component {
     };
   }
 
+  /** Organizer cell click handler.
+   *
+   * i: cell column index
+   * rowName: name of Organizer row
+   */
   handleClick(i, rowName) {
     // Square click handler (adds a pill to the Square)
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
@@ -144,6 +149,8 @@ class Session extends React.Component {
           medCounts: medCounts,
           selectedMed: this.state.selectedMed,
           compliance: compliance,
+          selectedRow: rowName,
+          selectedCol: i,
         },
       ]),
       stepNumber: history.length,
@@ -168,7 +175,11 @@ class Session extends React.Component {
     const current = history[this.state.stepNumber];
 
     const moves = history.map((step, move) => {
-      const desc = move ? "Go to move #" + move : "Go to session start";
+      const desc = move
+        ? `${step.selectedMed.name} added to ${step.selectedRow} ${
+            days[step.selectedCol].abbr
+          }`
+        : "Go to session start";
       let btnContext = "secondary";
       if (!move) {
         // doesn't have compliance object
@@ -179,14 +190,14 @@ class Session extends React.Component {
       }
 
       return (
-        <li key={move}>
-          <Button
-            variant={`outline-${btnContext}`}
-            onClick={() => this.jumpTo(move)}
-          >
-            {desc}
-          </Button>
-        </li>
+        <Button
+          variant={`outline-${btnContext}`}
+          onClick={() => this.jumpTo(move)}
+          active={move === this.state.stepNumber}
+          key={move}
+        >
+          {desc}
+        </Button>
       );
     });
 
@@ -236,7 +247,11 @@ class Session extends React.Component {
         </Row>
         <div className="game-info">
           <h3>History</h3>
-          <ol>{moves}</ol>
+          <Row>
+            <Col md={6}>
+              <div className="d-grid gap-1">{moves}</div>
+            </Col>
+          </Row>
         </div>
       </div>
     );
