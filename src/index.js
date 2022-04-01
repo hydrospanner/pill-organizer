@@ -297,9 +297,20 @@ function MedicationRule(props) {
         <Col xs={4}>
           <Form.Check type="checkbox" label="Daily" checked={true} disabled />
         </Col>
-        <Col xs={4}>
+        <Col xs={3}>
           at
           {timeOpts}
+        </Col>
+        <Col xs={1}>
+          <Button
+            variant="outline-danger"
+            className="delete"
+            onClick={(e) =>
+              props.handleMedRuleDelete(e, props.medIdx, props.ruleIdx)
+            }
+          >
+            <FontAwesomeIcon icon="fa-solid fa-trash" />
+          </Button>
         </Col>
       </Row>
     </div>
@@ -330,6 +341,9 @@ function Medication(props) {
         organizerMode={props.organizerMode}
         handleMedRuleChange={(e, mk, rk) =>
           props.handleMedRuleChange(e, mk, rk)
+        }
+        handleMedRuleDelete={(e, mk, rk) =>
+          props.handleMedRuleDelete(e, mk, rk)
         }
       />
     );
@@ -362,6 +376,12 @@ function Medication(props) {
         />
       </Form.Group>
       <div>{rules}</div>
+      <Button
+        variant="secondary"
+        onClick={(e) => props.clickAddMedRule(e, props.medIdx)}
+      >
+        Add Rule
+      </Button>
     </div>
   );
 }
@@ -379,6 +399,10 @@ class SessionConfig extends React.Component {
           handleMedDelete={(e, i) => this.props.handleMedDelete(e, i)}
           handleMedRuleChange={(e, mk, rk) =>
             this.props.handleMedRuleChange(e, mk, rk)
+          }
+          clickAddMedRule={(e, mk) => this.props.clickAddMedRule(e, mk)}
+          handleMedRuleDelete={(e, mk, rk) =>
+            this.props.handleMedRuleDelete(e, mk, rk)
           }
         />
       );
@@ -459,6 +483,24 @@ class OverLord extends React.Component {
     this.incrementSessionKey();
   }
 
+  clickAddMedRule(e, medIdx) {
+    const meds = cloneDeep(this.state.medications);
+    meds[medIdx].rules.push(Object.create(this.newRule));
+    this.setState({
+      medications: meds,
+    });
+    this.incrementSessionKey();
+  }
+
+  handleMedRuleDelete(e, medIdx, ruleIdx) {
+    const meds = cloneDeep(this.state.medications);
+    meds[medIdx].rules.splice(ruleIdx, 1);
+    this.setState({
+      medications: meds,
+    });
+    this.incrementSessionKey();
+  }
+
   handleMedChange(event, medKey) {
     const target = event.target;
     const value = target.type === "checkbox" ? target.checked : target.value;
@@ -519,6 +561,10 @@ class OverLord extends React.Component {
           handleMedRuleChange={(e, mk, rk) =>
             this.handleMedRuleChange(e, mk, rk)
           }
+          clickAddMedRule={(e, mk) => this.clickAddMedRule(e, mk)}
+          handleMedRuleDelete={(e, mk, rk) =>
+            this.handleMedRuleDelete(e, mk, rk)
+          }
         />
       </div>
     );
@@ -533,6 +579,16 @@ ReactDOM.render(
   document.getElementById("root")
 );
 
+/** Vectorized array addition.
+ */
+function addVector(a, b) {
+  return a.map((e, i) => e + b[i]);
+}
+
+function arraySum(ary) {
+  return ary.reduce((partialSum, a) => partialSum + a, 0);
+}
+
 /** Determine Organizer rule compliance.
  *
  * Returns: object indicating med exceeded (failure), under (in progress),
@@ -540,9 +596,15 @@ ReactDOM.render(
  */
 function determineCompliance(squares, medications) {
   const compliance = { met: true, exceeded: false };
+  // Combine the take amount for each row based on each Med's rule.
+  // Then, compare that to the Organizer Squares
   medications.forEach((med, i) => {
+    const combinedRules = {};
     for (const rowName in squares) {
-      med.rules.forEach((rule) => {
+      combinedRules[rowName] = new Array(days.length).fill(0);
+    }
+    med.rules.forEach((rule) => {
+      for (const rowName in squares) {
         let dailyTake;
         if (rule[rowName]) {
           // compare the amounts in the squares row for the med to the rule.take
@@ -550,16 +612,18 @@ function determineCompliance(squares, medications) {
         } else {
           dailyTake = 0;
         }
-        const correctAmt = new Array(days.length).fill(dailyTake);
-        compliance.met =
-          compliance.met && isEqual(squares[rowName][med.name], correctAmt);
-        const rowTot = squares[rowName][med.name].reduce(
-          (partialSum, a) => partialSum + a,
-          0
-        );
-        compliance.exceeded =
-          compliance.exceeded || rowTot > dailyTake * days.length;
-      });
+        const ruleAmt = new Array(days.length).fill(dailyTake);
+        combinedRules[rowName] = addVector(combinedRules[rowName], ruleAmt);
+      }
+    });
+    // Use the combined rule amounts to check for rule compliance
+    for (const rowName in squares) {
+      compliance.met =
+        compliance.met &&
+        isEqual(squares[rowName][med.name], combinedRules[rowName]);
+      const rowTot = arraySum(squares[rowName][med.name]);
+      compliance.exceeded =
+        compliance.exceeded || rowTot > arraySum(combinedRules[rowName]);
     }
   });
   return compliance;
