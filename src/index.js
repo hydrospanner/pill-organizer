@@ -285,7 +285,7 @@ function MedicationRule(props) {
               value={props.take}
               type="number"
               name="take"
-              min={0}
+              min={1}
               max={100}
               onChange={(e) =>
                 props.handleMedRuleChange(e, props.medIdx, props.ruleIdx)
@@ -335,7 +335,7 @@ function Medication(props) {
     return (
       <MedicationRule
         take={rule.take}
-        key={i}
+        key={`${props.medIdx}-${i}`}
         ruleIdx={i}
         medIdx={props.medIdx}
         organizerMode={props.organizerMode}
@@ -478,7 +478,7 @@ class OverLord extends React.Component {
   clickAddMedication() {
     const meds = cloneDeep(this.state.medications);
     this.setState({
-      medications: meds.concat([Object.create(this.newMedication)]),
+      medications: meds.concat([cloneDeep(this.newMedication)]),
     });
     this.incrementSessionKey();
   }
