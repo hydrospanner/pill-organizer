@@ -11,6 +11,7 @@ import {
   faMoon,
   faTrash,
   faPills,
+  faBed,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -18,7 +19,7 @@ import Button from "react-bootstrap/Button";
 import { ButtonGroup, ToggleButton, Row, Col, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-library.add(faMugSaucer, faSun, faMoon, faTrash, faPills);
+library.add(faMugSaucer, faSun, faMoon, faTrash, faPills, faBed);
 
 const orgRow = {
   morning: { name: "Morning", icon: "fa-mug-saucer", className: "morning" },
@@ -82,6 +83,9 @@ function OrganizerRow(props) {
   });
   return (
     <div key={props.rowIdx} className={`board-row ${props.orgRow.className}`}>
+      <div className="square icon-cell">
+        <FontAwesomeIcon icon={props.orgRow.icon} />
+      </div>
       {daySquares}
     </div>
   );
@@ -223,7 +227,10 @@ class Session extends React.Component {
 
     return (
       <div className="game">
-        <div className="board-header">{header}</div>
+        <div className="board-header">
+          <div></div>
+          {header}
+        </div>
         <div className="game-board">
           <Organizer
             medCounts={current.medCounts}

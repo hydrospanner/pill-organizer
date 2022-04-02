@@ -1,3 +1,13 @@
+:root {
+  --morning-color-light: #fffc3f;
+  --morning-color-dark: #a29e00;
+  --noon-color-light: #ff8383;
+  --noon-color-dark: #e34646;
+  --night-color-light: #3fd2ff;
+  --night-color-dark: #0486ae;
+  --bed-color-light: lightgray;
+  --bed-color-dark: #919191;
+}
 body {
   font: 14px "Century Gothic", Futura, sans-serif;
   margin: 20px;
@@ -23,13 +33,22 @@ ul {
   border: none;
   float: left;
   font-weight: bold;
-  height: 11vw;
+  height: 10vw;
   margin-right: -1px;
   margin-top: -1px;
   padding: 10px;
   text-align: center;
-  width: 14.28%;
-  overflow: auto;
+  width: 12.5%;
+  overflow: clip;
+}
+
+.square.icon-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.square.icon-cell svg {
+  height: 85%;
 }
 
 .square:focus {
@@ -52,7 +71,7 @@ ul {
 
 .board-header div {
   display: inline-flex;
-  width: 14.28%;
+  width: 12.5%;
   justify-content: center;
 }
 
@@ -68,29 +87,42 @@ ul {
 }
 
 .board-row.morning div.square {
-  background-color: #fffc3f;
+  background-color: var(--morning-color-light);
 }
 .board-row.noon div.square {
-  background-color: #ff8383;
+  background-color: var(--noon-color-light);
 }
 .board-row.night div.square {
-  background-color: #3fd2ff;
+  background-color: var(--night-color-light);
 }
 .board-row.bed div.square {
-  background-color: lightgray;
+  background-color: var(--bed-color-light);
 }
 
 .board-row.morning div.square button {
-  border-color: #cac60e;
+  border-color: var(--morning-color-dark);
 }
 .board-row.noon div.square button {
-  border-color: #e34646;
+  border-color: var(--noon-color-dark);
 }
 .board-row.night div.square button {
-  border-color: #0486ae;
+  border-color: var(--night-color-dark);
 }
 .board-row.bed div.square button {
-  border-color: #919191;
+  border-color: var(--bed-color-dark);
+}
+
+.board-row.morning .square.icon-cell {
+  color: var(--morning-color-dark);
+}
+.board-row.noon .square.icon-cell {
+  color: var(--noon-color-dark);
+}
+.board-row.night .square.icon-cell {
+  color: var(--night-color-dark);
+}
+.board-row.bed .square.icon-cell {
+  color: var(--bed-color-dark);
 }
 
 .board-row .square {
