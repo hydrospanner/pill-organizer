@@ -60,12 +60,11 @@ function Square(props) {
     return <div key={i}>{txt}</div>;
   });
   return (
-    <button
-      className="square"
-      onClick={(e) => props.onClick(props.colIdx, props.orgRow.name)}
-    >
-      {rows}
-    </button>
+    <div className="square">
+      <button onClick={(e) => props.onClick(props.colIdx, props.orgRow.name)}>
+        {rows}
+      </button>
+    </div>
   );
 }
 
@@ -175,11 +174,11 @@ class Session extends React.Component {
     const current = history[this.state.stepNumber];
 
     const moves = history.map((step, move) => {
-      const desc = move
-        ? `${step.selectedMed.name} added to ${step.selectedRow} ${
-            days[step.selectedCol].abbr
-          }`
-        : "Go to session start";
+      let desc = "Go to start";
+      if (move) {
+        const day = days[step.selectedCol].abbr;
+        desc = `${step.selectedMed.name} added to ${day} ${step.selectedRow}`;
+      }
       let btnContext = "secondary";
       if (!move) {
         // doesn't have compliance object
