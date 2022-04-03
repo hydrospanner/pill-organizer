@@ -61,10 +61,12 @@ function Square(props) {
     return <div key={i}>{txt}</div>;
   });
   return (
-    <div className="square">
-      <button onClick={(e) => props.onClick(props.colIdx, props.orgRow.name)}>
-        {rows}
-      </button>
+    <div className="square-container">
+      <div className="square">
+        <button onClick={(e) => props.onClick(props.colIdx, props.orgRow.name)}>
+          {rows}
+        </button>
+      </div>
     </div>
   );
 }
@@ -83,8 +85,10 @@ function OrganizerRow(props) {
   });
   return (
     <div key={props.rowIdx} className={`board-row ${props.orgRow.className}`}>
-      <div className="square icon-cell">
-        <FontAwesomeIcon icon={props.orgRow.icon} />
+      <div className="square-container">
+        <div className="square icon-cell">
+          <FontAwesomeIcon icon={props.orgRow.icon} />
+        </div>
       </div>
       {daySquares}
     </div>

@@ -22,23 +22,42 @@ ul {
   padding-left: 30px;
 }
 
+.board-row {
+  /* Eliminate space between rows. I'm not sure where it's coming from. */
+  margin-bottom: -6.5px;
+}
+
 .board-row:after {
   clear: both;
   content: "";
   display: table;
 }
 
+/* Container needed to match square height to width */
+.square-container {
+  width: 12.5%;
+  display: inline-block;
+  position: relative;
+}
+.square-container:after {
+  content: "";
+  display: block;
+  margin-top: 100%;
+}
+
 .square {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
   background: #fff;
   border: none;
   float: left;
   font-weight: bold;
-  height: 10vw;
-  margin-right: -1px;
-  margin-top: -1px;
   padding: 10px;
   text-align: center;
-  width: 12.5%;
   overflow: clip;
 }
 
