@@ -467,7 +467,7 @@ class OverLord extends React.Component {
     };
     this.state = {
       organizerMode: organizerModes[2],
-      medications: [Object.create(this.newMedication)],
+      medications: [cloneDeep(this.newMedication)],
       sessionKey: 0,
     };
   }
