@@ -288,7 +288,7 @@ function MedicationRule(props) {
   return (
     <div className="medication-rule">
       <Row>
-        <Col xs={4}>
+        <Col sm={4} xs={6}>
           <Form.Group className="mb-2">
             <Form.Label>Take</Form.Label>
             <Form.Control
@@ -304,14 +304,14 @@ function MedicationRule(props) {
             />
           </Form.Group>
         </Col>
-        <Col xs={4}>
+        <Col sm={4} xs={6}>
           <Form.Check type="checkbox" label="Daily" checked={true} disabled />
         </Col>
-        <Col xs={3}>
+        <Col sm={3} xs={6}>
           at
           {timeOpts}
         </Col>
-        <Col xs={1}>
+        <Col sm={1} xs={6}>
           <Button
             variant="outline-danger"
             className="delete"
