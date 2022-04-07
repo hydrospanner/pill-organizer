@@ -111,6 +111,45 @@ function Organizer(props) {
   return <div>{rows}</div>;
 }
 
+function MoveHistory(props) {
+  const history = props.history;
+  const moves = history.map((step, move) => {
+    let desc = "Go to start";
+    if (move) {
+      const day = days[step.selectedCol].abbr;
+      desc = `${step.selectedMed.name} added to ${day} ${step.selectedRow}`;
+    }
+    let btnContext = "secondary";
+    if (!move) {
+      // doesn't have compliance object
+    } else if (step.compliance.met) {
+      btnContext = "success";
+    } else if (step.compliance.exceeded) {
+      btnContext = "danger";
+    }
+    return (
+      <Button
+        variant={`outline-${btnContext}`}
+        onClick={() => props.jumpTo(move)}
+        active={move === props.stepNumber}
+        key={move}
+      >
+        {desc}
+      </Button>
+    );
+  });
+  return (
+    <React.Fragment>
+      <h3>History</h3>
+      <Row>
+        <Col md={6}>
+          <div className="d-grid gap-1">{moves}</div>
+        </Col>
+      </Row>
+    </React.Fragment>
+  );
+}
+
 class Session extends React.Component {
   // Session trying to match fulfill pill instructions
   constructor(props) {
@@ -181,33 +220,6 @@ class Session extends React.Component {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
 
-    const moves = history.map((step, move) => {
-      let desc = "Go to start";
-      if (move) {
-        const day = days[step.selectedCol].abbr;
-        desc = `${step.selectedMed.name} added to ${day} ${step.selectedRow}`;
-      }
-      let btnContext = "secondary";
-      if (!move) {
-        // doesn't have compliance object
-      } else if (step.compliance.met) {
-        btnContext = "success";
-      } else if (step.compliance.exceeded) {
-        btnContext = "danger";
-      }
-
-      return (
-        <Button
-          variant={`outline-${btnContext}`}
-          onClick={() => this.jumpTo(move)}
-          active={move === this.state.stepNumber}
-          key={move}
-        >
-          {desc}
-        </Button>
-      );
-    });
-
     const medOptions = this.state.medOptions.map((i, j) => {
       return (
         <ToggleButton
@@ -228,6 +240,17 @@ class Session extends React.Component {
         </div>
       );
     });
+    let moveHistory = "";
+    // Show history if there is any
+    if (history.length > 1) {
+      moveHistory = (
+        <MoveHistory
+          history={this.state.history}
+          stepNumber={this.state.stepNumber}
+          jumpTo={(step) => this.jumpTo(step)}
+        />
+      );
+    }
 
     return (
       <div className="game">
@@ -255,14 +278,7 @@ class Session extends React.Component {
             <div>{this.state.selectedMed.instructions}</div>
           </Col>
         </Row>
-        <div className="game-info">
-          <h3>History</h3>
-          <Row>
-            <Col md={6}>
-              <div className="d-grid gap-1">{moves}</div>
-            </Col>
-          </Row>
-        </div>
+        <div className="game-info">{moveHistory}</div>
       </div>
     );
   }
@@ -440,6 +456,7 @@ class SessionConfig extends React.Component {
           <h3>Medications</h3>
           <div>{medications}</div>
           <Button
+            className="mb-2"
             onClick={() => this.props.clickAddMedication()}
             type="Button"
             variant="secondary"
