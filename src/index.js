@@ -108,7 +108,7 @@ function Organizer(props) {
     );
   });
 
-  return <div>{rows}</div>;
+  return <React.Fragment>{rows}</React.Fragment>;
 }
 
 function MoveHistory(props) {
@@ -449,7 +449,7 @@ class SessionConfig extends React.Component {
     });
     return (
       <div>
-        <Form>
+        <Form onSubmit={(e) => this.props.onSubmit(e)}>
           <h2>Session Configuration</h2>
           <h3>Organizer type</h3>
           <div>{organizerOpts}</div>
@@ -463,6 +463,9 @@ class SessionConfig extends React.Component {
           >
             Add Medication
             <FontAwesomeIcon icon="fa-solid fa-pills" />
+          </Button>
+          <Button className="mb-2" type="Submit" variant="primary">
+            Save
           </Button>
         </Form>
       </div>
@@ -486,6 +489,7 @@ class OverLord extends React.Component {
       organizerMode: organizerModes[2],
       medications: [cloneDeep(this.newMedication)],
       sessionKey: 0,
+      showSessionConfig: true,
     };
   }
 
@@ -565,19 +569,19 @@ class OverLord extends React.Component {
     this.incrementSessionKey();
   }
 
+  handleSessionConfigSubmit(event) {
+    this.setState({
+      showSessionConfig: false,
+    });
+    event.preventDefault();
+  }
+
   render() {
-    return (
-      <div className="container">
-        <div>
-          <h1>Pill Master 3000</h1>
-        </div>
-        <Session
-          organizerMode={this.state.organizerMode}
-          key={this.state.sessionKey}
-          header={days.map((day) => day.abbr)}
-          medications={this.state.medications}
-        />
+    let sessionConfig = null;
+    if (this.state.showSessionConfig) {
+      sessionConfig = (
         <SessionConfig
+          onSubmit={(e) => this.handleSessionConfigSubmit(e)}
           onRowChange={(i) => this.setRows(i)}
           onOrgModeChange={(e) => this.setOrganizerMode(e)}
           clickAddMedication={(i) => this.clickAddMedication(i)}
@@ -593,6 +597,34 @@ class OverLord extends React.Component {
             this.handleMedRuleDelete(e, mk, rk)
           }
         />
+      );
+    }
+    let editSession = null;
+    if (!this.state.showSessionConfig) {
+      editSession = (
+        <Button
+          className="mb-2"
+          onClick={() => this.setState({ showSessionConfig: true })}
+          type="Button"
+          variant="secondary"
+        >
+          Edit Session Configuration
+        </Button>
+      );
+    }
+    return (
+      <div className="container">
+        <div>
+          <h1>Pill Master 3000</h1>
+        </div>
+        <Session
+          organizerMode={this.state.organizerMode}
+          key={this.state.sessionKey}
+          header={days.map((day) => day.abbr)} // TODO: don't need to pass this
+          medications={this.state.medications}
+        />
+        {editSession}
+        {sessionConfig}
       </div>
     );
   }
