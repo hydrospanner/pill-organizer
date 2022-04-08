@@ -262,6 +262,22 @@ class Session extends React.Component {
         />
       );
     }
+    let instructions = this.state.selectedMed.instructions;
+    if (instructions.length === 0) {
+      const instructionList = this.state.selectedMed.rules.map((rule, i) => {
+        const timeOpts = this.props.organizerMode.rows.map((row, j) => {
+          if (rule[row.name]) {
+            return (
+              <li key={`${i}-${j}`}>
+                Take {rule.take} at {row.name} Daily
+              </li>
+            );
+          }
+        });
+        return timeOpts;
+      });
+      instructions = <ul>{instructionList}</ul>;
+    }
 
     return (
       <div className="game">
@@ -286,7 +302,7 @@ class Session extends React.Component {
           <Col md>
             <h3>{this.state.selectedMed.name}</h3>
             <h4>Instructions</h4>
-            <div>{this.state.selectedMed.instructions}</div>
+            <div>{instructions}</div>
           </Col>
         </Row>
         <div className="game-info">{moveHistory}</div>
@@ -652,10 +668,6 @@ ReactDOM.render(
  */
 function addVector(a, b) {
   return a.map((e, i) => e + b[i]);
-}
-
-function arraySum(ary) {
-  return ary.reduce((partialSum, a) => partialSum + a, 0);
 }
 
 /** Determine Organizer rule compliance.
