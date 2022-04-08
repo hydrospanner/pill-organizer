@@ -159,3 +159,8 @@ ul {
   border-radius: 15px;
   opacity: 1;
 }
+
+.history-accordion-body {
+  max-height: 30vh;
+  overflow-y: scroll;
+}

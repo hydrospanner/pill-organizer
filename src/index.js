@@ -16,7 +16,14 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Button from "react-bootstrap/Button";
-import { ButtonGroup, ToggleButton, Row, Col, Form } from "react-bootstrap";
+import {
+  ButtonGroup,
+  ToggleButton,
+  Row,
+  Col,
+  Form,
+  Accordion,
+} from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 library.add(faMugSaucer, faSun, faMoon, faTrash, faPills, faBed);
@@ -139,14 +146,18 @@ function MoveHistory(props) {
     );
   });
   return (
-    <React.Fragment>
-      <h3>History</h3>
-      <Row>
-        <Col md={6}>
-          <div className="d-grid gap-1">{moves}</div>
-        </Col>
-      </Row>
-    </React.Fragment>
+    <Row>
+      <Col md={6}>
+        <Accordion>
+          <Accordion.Item eventKey="0">
+            <Accordion.Header>History</Accordion.Header>
+            <Accordion.Body className="history-accordion-body">
+              <div className="d-grid gap-1">{moves}</div>
+            </Accordion.Body>
+          </Accordion.Item>
+        </Accordion>
+      </Col>
+    </Row>
   );
 }
 
@@ -233,10 +244,10 @@ class Session extends React.Component {
         </ToggleButton>
       );
     });
-    const header = this.props.header.map((day, i) => {
+    const header = days.map((day, i) => {
       return (
         <div key={i}>
-          <h3>{day}</h3>
+          <h3>{day.abbr}</h3>
         </div>
       );
     });
@@ -620,7 +631,6 @@ class OverLord extends React.Component {
         <Session
           organizerMode={this.state.organizerMode}
           key={this.state.sessionKey}
-          header={days.map((day) => day.abbr)} // TODO: don't need to pass this
           medications={this.state.medications}
         />
         {editSession}
