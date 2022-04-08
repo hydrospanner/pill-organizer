@@ -680,9 +680,12 @@ function determineCompliance(squares, medications) {
       compliance.met =
         compliance.met &&
         isEqual(squares[rowName][med.name], combinedRules[rowName]);
-      const rowTot = arraySum(squares[rowName][med.name]);
-      compliance.exceeded =
-        compliance.exceeded || rowTot > arraySum(combinedRules[rowName]);
+      // Check for any cell above the daily take amount for that med & row.
+      combinedRules[rowName].forEach((ruleAmt, j) => {
+        if (squares[rowName][med.name][j] > ruleAmt) {
+          compliance.exceeded = true;
+        }
+      });
     }
   });
   return compliance;
