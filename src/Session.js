@@ -4,6 +4,7 @@ import isEqual from "lodash/isEqual";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import {
+  Alert,
   Button,
   ButtonGroup,
   ToggleButton,
@@ -112,18 +113,14 @@ function MoveHistory(props) {
     );
   });
   return (
-    <Row>
-      <Col md={6}>
-        <Accordion>
-          <Accordion.Item eventKey="0">
-            <Accordion.Header>History</Accordion.Header>
-            <Accordion.Body className="history-accordion-body">
-              <div className="d-grid gap-1">{moves}</div>
-            </Accordion.Body>
-          </Accordion.Item>
-        </Accordion>
-      </Col>
-    </Row>
+    <Accordion>
+      <Accordion.Item eventKey="0">
+        <Accordion.Header>History</Accordion.Header>
+        <Accordion.Body className="history-accordion-body">
+          <div className="d-grid gap-1">{moves}</div>
+        </Accordion.Body>
+      </Accordion.Item>
+    </Accordion>
   );
 }
 
@@ -146,11 +143,16 @@ export class Session extends React.Component {
         {
           selectedMed: this.props.medications[0],
           medCounts: rowMeds,
+          compliance: {
+            met: false,
+            exceeded: false,
+          },
         },
       ],
       stepNumber: 0,
       medOptions: this.props.medications,
       selectedMed: this.props.medications[0],
+      showComplianceMsg: false,
     };
   }
 
@@ -177,6 +179,7 @@ export class Session extends React.Component {
         },
       ]),
       stepNumber: history.length,
+      showComplianceMsg: false,
     });
   }
 
@@ -190,6 +193,12 @@ export class Session extends React.Component {
   setMedication(med) {
     this.setState({
       selectedMed: med,
+    });
+  }
+
+  setComplianceMsg() {
+    this.setState({
+      showComplianceMsg: true,
     });
   }
 
@@ -245,6 +254,25 @@ export class Session extends React.Component {
       });
       instructions = <ul>{instructionList}</ul>;
     }
+    let complianceMsg = "";
+    if (this.state.showComplianceMsg) {
+      const compliance = this.state.history[this.state.stepNumber].compliance;
+      let complianceTxt = "";
+      let complianceVariant;
+      if (compliance.met) {
+        complianceTxt = "🎉 Medications successfully organized 🎉";
+        complianceVariant = "success";
+      } else if (compliance.exceeded) {
+        complianceTxt = "Too many medications added";
+        complianceVariant = "danger";
+      } else {
+        complianceTxt = "Some medications are missing";
+        complianceVariant = "warning";
+      }
+      complianceMsg = (
+        <Alert variant={complianceVariant}>{complianceTxt}</Alert>
+      );
+    }
 
     return (
       <div className="game">
@@ -272,7 +300,22 @@ export class Session extends React.Component {
             <div>{instructions}</div>
           </Col>
         </Row>
-        <div className="game-info">{moveHistory}</div>
+        <div className="game-info">
+          <Row>
+            <Col md={6}>
+              <Button
+                className="mb-2"
+                variant="primary"
+                type="button"
+                onClick={() => this.setComplianceMsg()}
+              >
+                Done (check rules)
+              </Button>
+              {complianceMsg}
+            </Col>
+            <Col md={6}>{moveHistory}</Col>
+          </Row>
+        </div>
       </div>
     );
   }
