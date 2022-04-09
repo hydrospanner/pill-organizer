@@ -192,18 +192,19 @@ export class SessionConfig extends React.Component {
           <div>{organizerOpts}</div>
           <h3>Medications</h3>
           <div>{medications}</div>
-          <Button
-            className="mb-2"
-            onClick={() => this.props.clickAddMedication()}
-            type="Button"
-            variant="secondary"
-          >
-            Add Medication
-            <FontAwesomeIcon icon="fa-solid fa-pills" />
-          </Button>
-          <Button className="mb-2" type="Submit" variant="primary">
-            Save
-          </Button>
+          <div className="d-grid gap-2 mb-2">
+            <Button
+              onClick={() => this.props.clickAddMedication()}
+              type="Button"
+              variant="secondary"
+            >
+              Add Medication
+              <FontAwesomeIcon icon="fa-solid fa-pills" />
+            </Button>
+            <Button type="Submit" variant="primary">
+              Save & Start Session
+            </Button>
+          </div>
         </Form>
       </div>
     );

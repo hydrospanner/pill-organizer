@@ -130,30 +130,28 @@ export class App extends React.Component {
         />
       );
     }
-    let editSession = null;
-    if (!this.state.showSessionConfig) {
-      editSession = (
-        <Button
-          className="mb-2"
-          onClick={() => this.setState({ showSessionConfig: true })}
-          type="Button"
-          variant="secondary"
-        >
-          Edit Session Configuration
-        </Button>
-      );
-    }
     return (
       <div className="container">
         <div>
           <h1>Pill Master 3000</h1>
         </div>
-        <Session
-          organizerMode={this.state.organizerMode}
-          key={this.state.sessionKey}
-          medications={this.state.medications}
-        />
-        {editSession}
+        {!this.state.showSessionConfig && (
+          <React.Fragment>
+            <Session
+              organizerMode={this.state.organizerMode}
+              key={this.state.sessionKey}
+              medications={this.state.medications}
+            />
+            <Button
+              className="mb-2"
+              onClick={() => this.setState({ showSessionConfig: true })}
+              type="Button"
+              variant="secondary"
+            >
+              Edit Session Configuration
+            </Button>
+          </React.Fragment>
+        )}
         {sessionConfig}
       </div>
     );
