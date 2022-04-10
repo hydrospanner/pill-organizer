@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/pill-organizer/static/css/main.fd87f69a.css",
+    "main.js": "/pill-organizer/static/js/main.6b2c8959.js",
+    "index.html": "/pill-organizer/index.html",
+    "main.fd87f69a.css.map": "/pill-organizer/static/css/main.fd87f69a.css.map",
+    "main.6b2c8959.js.map": "/pill-organizer/static/js/main.6b2c8959.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.fd87f69a.css",
+    "static/js/main.6b2c8959.js"
+  ]
+}
