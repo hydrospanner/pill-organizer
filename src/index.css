@@ -34,7 +34,7 @@ ul {
   display: table;
 }
 
-/* Container needed to match square height to width */
+/* Container * pseudo element are needed to match square height to width */
 .square-container {
   width: 12.5%;
   display: inline-block;
@@ -73,14 +73,6 @@ ul {
 }
 .square.icon-cell svg {
   height: 85%;
-}
-
-.square:focus {
-  outline: none;
-}
-
-.kbd-navigation .square:focus {
-  background: #ddd;
 }
 
 .game {

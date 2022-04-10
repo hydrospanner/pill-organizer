@@ -146,7 +146,7 @@ export class App extends React.Component {
               className="mb-2 mt-5"
               onClick={() => this.setState({ showSessionConfig: true })}
               type="Button"
-              variant="secondary"
+              variant="outline-secondary"
             >
               Edit Session Configuration
             </Button>
