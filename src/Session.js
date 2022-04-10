@@ -303,14 +303,16 @@ export class Session extends React.Component {
         <div className="game-info">
           <Row>
             <Col md={6}>
-              <Button
-                className="mb-2"
-                variant="primary"
-                type="button"
-                onClick={() => this.setComplianceMsg()}
-              >
-                Done (check rules)
-              </Button>
+              <div className="d-grid gap-2 mb-2">
+                <Button
+                  className="mb-2"
+                  variant="outline-primary"
+                  type="button"
+                  onClick={() => this.setComplianceMsg()}
+                >
+                  Done (check rules)
+                </Button>
+              </div>
               {complianceMsg}
             </Col>
             <Col md={6}>{moveHistory}</Col>

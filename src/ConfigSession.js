@@ -34,6 +34,7 @@ function MedicationRule(props) {
         }
         key={i}
         id={`med-rule-${props.medIdx}-${props.ruleIdx}-${i}`}
+        checked={props.rule[row.name] === true}
       />
     );
   });
@@ -45,7 +46,7 @@ function MedicationRule(props) {
           <Form.Group className="mb-2">
             <Form.Label>Take</Form.Label>
             <Form.Control
-              value={props.take}
+              value={props.rule.take}
               type="number"
               name="take"
               min={1}
@@ -97,7 +98,7 @@ function Medication(props) {
   const rules = props.med.rules.map((rule, i) => {
     return (
       <MedicationRule
-        take={rule.take}
+        rule={rule}
         key={`${props.medIdx}-${i}`}
         ruleIdx={i}
         medIdx={props.medIdx}
