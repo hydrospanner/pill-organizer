@@ -11,6 +11,8 @@ import {
   Row,
   Col,
   Accordion,
+  Popover,
+  OverlayTrigger,
 } from "react-bootstrap";
 
 export const days = [
@@ -25,21 +27,43 @@ export const days = [
 
 function Square(props) {
   const display = [];
+  let selectedCount;
   for (const name in props.medCounts) {
+    const medCount = props.medCounts[name][props.colIdx];
     if (props.medCounts[name][props.colIdx]) {
-      display.push(`${name}: ${props.medCounts[name][props.colIdx]}`);
+      display.push(`${name}: ${medCount}`);
+    }
+    if (name === props.selectedMed.name && medCount) {
+      selectedCount = medCount;
     }
   }
   // display count of each medication in row
-  const rows = display.map((txt, i) => {
+  let rows = display.map((txt, i) => {
     return <div key={i}>{txt}</div>;
   });
+  if (!rows.length) {
+    rows = "Empty";
+  }
+  const popover = (
+    <Popover>
+      <Popover.Header as="h3">Med Counts</Popover.Header>
+      <Popover.Body>{rows}</Popover.Body>
+    </Popover>
+  );
   return (
     <div className="square-container">
       <div className="square">
-        <button onClick={(e) => props.onClick(props.colIdx, props.orgRow.name)}>
-          {rows}
-        </button>
+        <OverlayTrigger
+          trigger={["hover", "focus"]}
+          placement="bottom-end"
+          overlay={popover}
+        >
+          <button
+            onClick={(e) => props.onClick(props.colIdx, props.orgRow.name)}
+          >
+            <h3 className="cell-count">{selectedCount}</h3>
+          </button>
+        </OverlayTrigger>
       </div>
     </div>
   );
@@ -53,6 +77,7 @@ function OrganizerRow(props) {
         medCounts={props.medCounts[props.orgRow.name]}
         onClick={(e, n) => props.onClick(e, n)}
         orgRow={props.orgRow}
+        selectedMed={props.selectedMed}
         key={`${props.orgRow.name}-${day.abbr}`}
       />
     );
@@ -78,6 +103,7 @@ function Organizer(props) {
         onClick={(e, n) => props.onClick(e, n)}
         orgRow={orgRow}
         key={orgRow.name}
+        selectedMed={props.selectedMed}
       />
     );
   });
@@ -285,6 +311,7 @@ export class Session extends React.Component {
             medCounts={current.medCounts}
             onClick={(e, n) => this.handleClick(e, n)}
             organizerMode={this.props.organizerMode}
+            selectedMed={this.state.selectedMed}
           />
         </div>
         <Row>

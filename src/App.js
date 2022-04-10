@@ -143,7 +143,7 @@ export class App extends React.Component {
               medications={this.state.medications}
             />
             <Button
-              className="mb-2"
+              className="mb-2 mt-5"
               onClick={() => this.setState({ showSessionConfig: true })}
               type="Button"
               variant="secondary"
