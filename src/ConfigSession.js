@@ -20,6 +20,15 @@ export const organizerModes = [
     rows: [orgRow.morning, orgRow.day, orgRow.night, orgRow.bed],
   },
 ];
+export const defaultMedColors = [
+  "#ef2929",
+  "#fcaf3e",
+  "#fce94f",
+  "#8ae234",
+  "#729fcf",
+  "#ad7fa8",
+  "#eeeeec",
+];
 
 function MedicationRule(props) {
   // Rule for how the medication is to be taken.
@@ -114,6 +123,7 @@ function Medication(props) {
   });
   return (
     <div className="medication-form">
+      <div>{deleteBtn}</div>
       <Row>
         <Col xs={10}>
           <Form.Group className="mb-2">
@@ -128,7 +138,19 @@ function Medication(props) {
             />
           </Form.Group>
         </Col>
-        <Col xs={2}>{deleteBtn}</Col>
+        <Col xs={2}>
+          <Form.Label htmlFor={`medColorInput-${props.medIdx}`}>
+            Color
+          </Form.Label>
+          <Form.Control
+            type="color"
+            id={`medColorInput-${props.medIdx}`}
+            name="color"
+            defaultValue={props.med.color}
+            onChange={(e) => props.handleMedChange(e, props.medIdx)}
+            title="Choose medication color"
+          />
+        </Col>
       </Row>
       <Form.Group className="mb-2">
         <Form.Label>Instructions</Form.Label>

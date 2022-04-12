@@ -2,12 +2,15 @@ import React from "react";
 import cloneDeep from "lodash/cloneDeep";
 import { Button } from "react-bootstrap";
 import { Session } from "./Session";
-import { SessionConfig, organizerModes } from "./ConfigSession";
+import {
+  SessionConfig,
+  organizerModes,
+  defaultMedColors,
+} from "./ConfigSession";
 
 export class App extends React.Component {
   // Handle modifications to game config here
-  // - (row/col changes)
-  // - instruction changes
+  // - (e.g., row/rule changes)
   constructor(props) {
     super(props);
     this.newRule = { take: 1 };
@@ -15,6 +18,7 @@ export class App extends React.Component {
       name: "",
       instructions: "",
       rules: [Object.create(this.newRule)],
+      color: defaultMedColors[0],
     };
     this.state = {
       organizerMode: organizerModes[2],
@@ -39,8 +43,11 @@ export class App extends React.Component {
 
   clickAddMedication() {
     const meds = cloneDeep(this.state.medications);
+    const newMed = cloneDeep(this.newMedication);
+    // suggest a unique color
+    newMed.color = defaultMedColors[meds.length % defaultMedColors.length];
     this.setState({
-      medications: meds.concat([cloneDeep(this.newMedication)]),
+      medications: meds.concat([newMed]),
     });
     this.incrementSessionKey();
   }
