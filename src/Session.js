@@ -30,7 +30,6 @@ function CellPills(props) {
   if (props.selectedCount > 9) {
     return <h3 className="cell-count">{props.selectedCount}</h3>;
   }
-  const cols = 3;
   const pills = [];
   for (let pillIdx = 0; pillIdx < props.selectedCount; pillIdx++) {
     const pill = (

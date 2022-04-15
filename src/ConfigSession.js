@@ -126,8 +126,9 @@ function Medication(props) {
       <Row>
         <Col xs={10}>
           <Form.Group className="mb-2">
-            <Form.Label>Name</Form.Label>
+            <Form.Label htmlFor={`med-name-${props.medIdx}`}>Name</Form.Label>
             <Form.Control
+              id={`med-name-${props.medIdx}`}
               type="text"
               name="name"
               maxLength="50"
@@ -155,8 +156,11 @@ function Medication(props) {
         </Col>
       </Row>
       <Form.Group className="mb-2">
-        <Form.Label>Instructions</Form.Label>
+        <Form.Label htmlFor={`med-instructions-${props.medIdx}`}>
+          Instructions
+        </Form.Label>
         <Form.Control
+          id={`med-instructions-${props.medIdx}`}
           as="textarea"
           name="instructions"
           onChange={(e) => props.handleMedChange(e, props.medIdx)}
