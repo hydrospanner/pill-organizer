@@ -123,7 +123,6 @@ function Medication(props) {
   });
   return (
     <div className="medication-form">
-      <div>{deleteBtn}</div>
       <Row>
         <Col xs={10}>
           <Form.Group className="mb-2">
@@ -138,6 +137,9 @@ function Medication(props) {
             />
           </Form.Group>
         </Col>
+        <Col xs={2}>{deleteBtn}</Col>
+      </Row>
+      <Row>
         <Col xs={2}>
           <Form.Label htmlFor={`medColorInput-${props.medIdx}`}>
             Color
