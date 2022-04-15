@@ -25,6 +25,28 @@ export const days = [
   { name: "Saturday", abbr: "Sat" },
 ];
 
+/** The pills in an Organizer Cell */
+function CellPills(props) {
+  if (props.selectedCount > 9) {
+    return <h3 className="cell-count">{props.selectedCount}</h3>;
+  }
+  const cols = 3;
+  const pills = [];
+  for (let pillIdx = 0; pillIdx < props.selectedCount; pillIdx++) {
+    const pill = (
+      <div className="pill-col" xs="4" key={pillIdx}>
+        <div
+          className="pill"
+          key={pillIdx}
+          style={{ backgroundColor: props.selectedMed.color }}
+        ></div>
+      </div>
+    );
+    pills.push(pill);
+  }
+  return <div className="pill-row">{pills}</div>;
+}
+
 function Square(props) {
   const display = [];
   let selectedCount;
@@ -61,7 +83,10 @@ function Square(props) {
           <button
             onClick={(e) => props.onClick(props.colIdx, props.orgRow.name)}
           >
-            <h3 className="cell-count">{selectedCount}</h3>
+            <CellPills
+              selectedMed={props.selectedMed}
+              selectedCount={selectedCount}
+            ></CellPills>
           </button>
         </OverlayTrigger>
       </div>
