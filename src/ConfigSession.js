@@ -20,6 +20,15 @@ export const organizerModes = [
     rows: [orgRow.morning, orgRow.day, orgRow.night, orgRow.bed],
   },
 ];
+export const defaultMedColors = [
+  "#ef2929",
+  "#fcaf3e",
+  "#fce94f",
+  "#8ae234",
+  "#729fcf",
+  "#ad7fa8",
+  "#eeeeec",
+];
 
 function MedicationRule(props) {
   // Rule for how the medication is to be taken.
@@ -117,8 +126,9 @@ function Medication(props) {
       <Row>
         <Col xs={10}>
           <Form.Group className="mb-2">
-            <Form.Label>Name</Form.Label>
+            <Form.Label htmlFor={`med-name-${props.medIdx}`}>Name</Form.Label>
             <Form.Control
+              id={`med-name-${props.medIdx}`}
               type="text"
               name="name"
               maxLength="50"
@@ -130,9 +140,27 @@ function Medication(props) {
         </Col>
         <Col xs={2}>{deleteBtn}</Col>
       </Row>
+      <Row>
+        <Col xs={2}>
+          <Form.Label htmlFor={`medColorInput-${props.medIdx}`}>
+            Color
+          </Form.Label>
+          <Form.Control
+            type="color"
+            id={`medColorInput-${props.medIdx}`}
+            name="color"
+            defaultValue={props.med.color}
+            onChange={(e) => props.handleMedChange(e, props.medIdx)}
+            title="Choose medication color"
+          />
+        </Col>
+      </Row>
       <Form.Group className="mb-2">
-        <Form.Label>Instructions</Form.Label>
+        <Form.Label htmlFor={`med-instructions-${props.medIdx}`}>
+          Instructions
+        </Form.Label>
         <Form.Control
+          id={`med-instructions-${props.medIdx}`}
           as="textarea"
           name="instructions"
           onChange={(e) => props.handleMedChange(e, props.medIdx)}
