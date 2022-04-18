@@ -13,6 +13,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import "bootstrap/dist/css/bootstrap.min.css";
+import { DndProvider } from "react-dnd";
+import { TouchBackend } from "react-dnd-touch-backend";
 
 import { App } from "./App";
 
@@ -22,6 +24,8 @@ const container = document.getElementById("root");
 const root = createRoot(container);
 root.render(
   <React.StrictMode>
-    <App />
+    <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
+      <App />
+    </DndProvider>
   </React.StrictMode>
 );

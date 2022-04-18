@@ -14,6 +14,7 @@ import {
   Popover,
   OverlayTrigger,
 } from "react-bootstrap";
+import { useDrag, useDrop } from "react-dnd";
 
 export const days = [
   { name: "Sunday", abbr: "Sun" },
@@ -47,6 +48,15 @@ function CellPills(props) {
 }
 
 function Square(props) {
+  const [{ isOver }, drop] = useDrop(() => ({
+    accept: "pill-bottle",
+    drop: () => props.onClick(props.colIdx, props.orgRow.name),
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+    }),
+  }));
+
+  // Popover
   const display = [];
   let selectedCount;
   for (const name in props.medCounts) {
@@ -71,9 +81,10 @@ function Square(props) {
       <Popover.Body>{rows}</Popover.Body>
     </Popover>
   );
+
   return (
     <div className="square-container">
-      <div className="square">
+      <div className="square" ref={drop}>
         <OverlayTrigger
           trigger={["hover", "focus"]}
           placement="bottom-end"
@@ -81,6 +92,10 @@ function Square(props) {
         >
           <button
             onClick={(e) => props.onClick(props.colIdx, props.orgRow.name)}
+            style={{
+              borderWidth: isOver ? "6px" : "3px",
+              cursor: isOver ? "move" : "pointer",
+            }}
           >
             <CellPills
               selectedMed={props.selectedMed}
@@ -173,6 +188,35 @@ function MoveHistory(props) {
     </Accordion>
   );
 }
+
+const PillBottle = (props) => {
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: "pill-bottle",
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  }));
+  return (
+    <React.Fragment>
+      <div
+        ref={drag}
+        className="pill-bottle"
+        style={{
+          opacity: isDragging ? 0.5 : 1,
+          cursor: isDragging ? "move" : "grab",
+        }}
+      >
+        <FontAwesomeIcon
+          icon="fa-pills"
+          size="3x"
+          style={{
+            color: props.selectedMed.color,
+          }}
+        />
+      </div>
+    </React.Fragment>
+  );
+};
 
 export class Session extends React.Component {
   // Session trying to match fulfill pill instructions
@@ -338,14 +382,17 @@ export class Session extends React.Component {
             selectedMed={this.state.selectedMed}
           />
         </div>
-        <Row>
-          <Col md>
-            <div className="med-selection">
+        <Row className="mb-1 mt-1">
+          <Col md sm={6}>
+            <div className="med-selection no-select">
               <h5>Select Medication</h5>
               <ButtonGroup vertical>{medOptions}</ButtonGroup>
             </div>
           </Col>
-          <Col md>
+          <Col md sm={6}>
+            <PillBottle selectedMed={this.state.selectedMed} />
+          </Col>
+          <Col md className="no-select">
             <h3>{this.state.selectedMed.name}</h3>
             <h4>Instructions</h4>
             <div>{instructions}</div>
