@@ -26,6 +26,30 @@ export const days = [
   { name: "Saturday", abbr: "Sat" },
 ];
 
+function CellPill(props) {
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: "pill",
+    item: {
+      colIdx: props.colIdx,
+      orgRow: props.orgRow,
+    },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  }));
+  return (
+    <div
+      className="pill"
+      ref={drag}
+      style={{
+        backgroundColor: props.selectedMed.color,
+        opacity: isDragging ? 0.5 : 1,
+        cursor: isDragging ? "move" : "grab",
+      }}
+    ></div>
+  );
+}
+
 /** The pills in an Organizer Cell */
 function CellPills(props) {
   if (props.selectedCount > 9) {
@@ -35,11 +59,12 @@ function CellPills(props) {
   for (let pillIdx = 0; pillIdx < props.selectedCount; pillIdx++) {
     const pill = (
       <div className="pill-col" xs="4" key={pillIdx}>
-        <div
-          className="pill"
+        <CellPill
           key={pillIdx}
-          style={{ backgroundColor: props.selectedMed.color }}
-        ></div>
+          selectedMed={props.selectedMed}
+          colIdx={props.colIdx}
+          orgRow={props.orgRow}
+        />
       </div>
     );
     pills.push(pill);
@@ -50,7 +75,7 @@ function CellPills(props) {
 function Square(props) {
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "pill-bottle",
-    drop: () => props.onClick(props.colIdx, props.orgRow.name),
+    drop: () => props.addCellMedication(props.colIdx, props.orgRow.name),
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
@@ -91,7 +116,9 @@ function Square(props) {
           overlay={popover}
         >
           <button
-            onClick={(e) => props.onClick(props.colIdx, props.orgRow.name)}
+            onClick={(e) =>
+              props.addCellMedication(props.colIdx, props.orgRow.name)
+            }
             style={{
               borderWidth: isOver ? "6px" : "3px",
               cursor: isOver ? "move" : "pointer",
@@ -100,6 +127,8 @@ function Square(props) {
             <CellPills
               selectedMed={props.selectedMed}
               selectedCount={selectedCount}
+              colIdx={props.colIdx}
+              orgRow={props.orgRow}
             ></CellPills>
           </button>
         </OverlayTrigger>
@@ -114,7 +143,7 @@ function OrganizerRow(props) {
       <Square
         colIdx={colIdx}
         medCounts={props.medCounts[props.orgRow.name]}
-        onClick={(e, n) => props.onClick(e, n)}
+        addCellMedication={(e, n, o) => props.addCellMedication(e, n, o)}
         orgRow={props.orgRow}
         selectedMed={props.selectedMed}
         key={`${props.orgRow.name}-${day.abbr}`}
@@ -139,7 +168,7 @@ function Organizer(props) {
       <OrganizerRow
         medCounts={props.medCounts}
         rowIdx={rowIdx}
-        onClick={(e, n) => props.onClick(e, n)}
+        addCellMedication={(e, n, o) => props.addCellMedication(e, n, o)}
         orgRow={orgRow}
         key={orgRow.name}
         selectedMed={props.selectedMed}
@@ -156,7 +185,13 @@ function MoveHistory(props) {
     let desc = "Go to start";
     if (move) {
       const day = days[step.selectedCol].abbr;
-      desc = `${step.selectedMed.name} added to ${day} ${step.selectedRow}`;
+      if (step.increment >= 0) {
+        desc = `${step.increment} ${step.selectedMed.name} added to ${day} ${step.selectedRow}`;
+      } else {
+        desc = `${step.increment * -1} ${
+          step.selectedMed.name
+        } removed from ${day} ${step.selectedRow}`;
+      }
     }
     let btnContext = "secondary";
     if (!move) {
@@ -196,14 +231,26 @@ const PillBottle = (props) => {
       isDragging: !!monitor.isDragging(),
     }),
   }));
+  const [{ isOver }, drop] = useDrop(() => ({
+    accept: "pill",
+    drop: (item, monitor) => {
+      props.addCellMedication(item.colIdx, item.orgRow.name, {
+        increment: -1,
+      });
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+    }),
+  }));
   return (
     <React.Fragment>
       <div
-        ref={drag}
+        ref={(node) => drag(drop(node))}
         className="pill-bottle"
         style={{
           opacity: isDragging ? 0.5 : 1,
           cursor: isDragging ? "move" : "grab",
+          backgroundColor: isOver ? "lightgray" : "white",
         }}
       >
         <FontAwesomeIcon
@@ -250,17 +297,18 @@ export class Session extends React.Component {
     };
   }
 
-  /** Organizer cell click handler.
+  /** Organizer cell click/drag handler.
    *
    * i: cell column index
    * rowName: name of Organizer row
    */
-  handleClick(i, rowName) {
+  addCellMedication(i, rowName, opts = {}) {
+    const increment = opts.increment || 1;
     // Square click handler (adds a pill to the Square)
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const medCounts = cloneDeep(current.medCounts);
-    medCounts[rowName][this.state.selectedMed.name][i]++;
+    medCounts[rowName][this.state.selectedMed.name][i] += increment;
     const compliance = determineCompliance(medCounts, this.props.medications);
     this.setState({
       history: history.concat([
@@ -270,6 +318,7 @@ export class Session extends React.Component {
           compliance: compliance,
           selectedRow: rowName,
           selectedCol: i,
+          increment: increment,
         },
       ]),
       stepNumber: history.length,
@@ -377,7 +426,7 @@ export class Session extends React.Component {
         <div className="game-board">
           <Organizer
             medCounts={current.medCounts}
-            onClick={(e, n) => this.handleClick(e, n)}
+            addCellMedication={(e, n, o) => this.addCellMedication(e, n, o)}
             organizerMode={this.props.organizerMode}
             selectedMed={this.state.selectedMed}
           />
@@ -390,7 +439,10 @@ export class Session extends React.Component {
             </div>
           </Col>
           <Col md sm={6}>
-            <PillBottle selectedMed={this.state.selectedMed} />
+            <PillBottle
+              selectedMed={this.state.selectedMed}
+              addCellMedication={(e, n, o) => this.addCellMedication(e, n, o)}
+            />
           </Col>
           <Col md className="no-select">
             <h3>{this.state.selectedMed.name}</h3>
