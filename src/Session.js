@@ -116,9 +116,6 @@ function Square(props) {
           overlay={popover}
         >
           <button
-            onClick={(e) =>
-              props.addCellMedication(props.colIdx, props.orgRow.name)
-            }
             style={{
               borderWidth: isOver ? "6px" : "3px",
               cursor: isOver ? "move" : "pointer",
