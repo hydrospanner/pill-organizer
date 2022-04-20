@@ -1,6 +1,13 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, Row, Col, Form } from "react-bootstrap";
+import {
+  Button,
+  ButtonGroup,
+  ToggleButton,
+  Row,
+  Col,
+  Form,
+} from "react-bootstrap";
 
 const orgRow = {
   morning: { name: "Morning", icon: "fa-mug-saucer", className: "morning" },
@@ -91,6 +98,8 @@ function MedicationRule(props) {
 }
 
 function Medication(props) {
+  console.log(`rendering medication ${props.medIdx}`);
+  console.log(props.med);
   let deleteBtn = "";
   if (props.medIdx !== 0) {
     // at least one medication is needed
@@ -119,6 +128,32 @@ function Medication(props) {
           props.handleMedRuleDelete(e, mk, rk)
         }
       />
+    );
+  });
+  const medTypes = [
+    { name: "Tablet", value: "tablet", class: "medication-pill" },
+    { name: "Pill", value: "pill", class: "medication-pill" },
+  ];
+  const medTypesOptions = medTypes.map((type, i) => {
+    return (
+      <ToggleButton
+        name="medType"
+        key={i}
+        type="radio"
+        variant="outline-secondary"
+        value={type.value}
+        id={`medType-${type.value}-${props.medIdx}`}
+        checked={props.med.medType === type.value}
+        onChange={(e) => props.handleMedChange(e, props.medIdx)}
+      >
+        {type.name}
+        <div style={{ height: "5vw" }}>
+          <div
+            className={type.class}
+            style={{ backgroundColor: props.med.color }}
+          />
+        </div>
+      </ToggleButton>
     );
   });
   return (
@@ -153,6 +188,9 @@ function Medication(props) {
             onChange={(e) => props.handleMedChange(e, props.medIdx)}
             title="Choose medication color"
           />
+        </Col>
+        <Col xs={6}>
+          <ButtonGroup name="medType">{medTypesOptions}</ButtonGroup>
         </Col>
       </Row>
       <Form.Group className="mb-2">

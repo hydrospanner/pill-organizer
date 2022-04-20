@@ -19,6 +19,7 @@ export class App extends React.Component {
       instructions: "",
       rules: [Object.create(this.newRule)],
       color: defaultMedColors[0],
+      medType: "tablet",
     };
     this.state = {
       organizerMode: organizerModes[2],
@@ -71,9 +72,11 @@ export class App extends React.Component {
   }
 
   handleMedChange(event, medKey) {
+    console.log(event.target);
     const target = event.target;
     const value = target.type === "checkbox" ? target.checked : target.value;
     const name = target.name;
+    console.log(name, value, medKey);
     const meds = cloneDeep(this.state.medications);
     // use they key to edit the right medication
     meds[medKey][name] = value;

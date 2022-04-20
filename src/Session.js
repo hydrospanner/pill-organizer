@@ -39,7 +39,7 @@ function CellPill(props) {
   }));
   return (
     <div
-      className="pill"
+      className="medication-pill"
       ref={drag}
       style={{
         backgroundColor: props.selectedMed.color,
