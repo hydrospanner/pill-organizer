@@ -72,11 +72,15 @@ export class App extends React.Component {
   }
 
   handleMedChange(event, medKey) {
-    console.log(event.target);
     const target = event.target;
     const value = target.type === "checkbox" ? target.checked : target.value;
-    const name = target.name;
-    console.log(name, value, medKey);
+    let name = target.name;
+    // hack: the radio input names are the same for each medication, but all
+    // meds are on the same form.
+    // Try breaking up the forms.
+    if (name.startsWith("medType")) {
+      name = "medType";
+    }
     const meds = cloneDeep(this.state.medications);
     // use they key to edit the right medication
     meds[medKey][name] = value;

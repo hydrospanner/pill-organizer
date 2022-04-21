@@ -1,13 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  Button,
-  ButtonGroup,
-  ToggleButton,
-  Row,
-  Col,
-  Form,
-} from "react-bootstrap";
+import { Button, Row, Col, Form } from "react-bootstrap";
 
 const orgRow = {
   morning: { name: "Morning", icon: "fa-mug-saucer", className: "morning" },
@@ -135,25 +128,30 @@ function Medication(props) {
     { name: "Pill", value: "pill", class: "medication-pill" },
   ];
   const medTypesOptions = medTypes.map((type, i) => {
+    const label = (
+      <div>
+        {type.name}
+        <div style={{ height: "5vw", width: "5vw" }}>
+          <div
+            className={type.class}
+            style={{ backgroundColor: props.med.color }}
+          />
+        </div>
+      </div>
+    );
     return (
-      <ToggleButton
-        name="medType"
-        key={i}
+      <Form.Check
+        inline
+        name={`medType-${props.medIdx}`}
+        key={`${props.medIdx}-${i}`}
         type="radio"
         variant="outline-secondary"
         value={type.value}
         id={`medType-${type.value}-${props.medIdx}`}
         checked={props.med.medType === type.value}
         onChange={(e) => props.handleMedChange(e, props.medIdx)}
-      >
-        {type.name}
-        <div style={{ height: "5vw" }}>
-          <div
-            className={type.class}
-            style={{ backgroundColor: props.med.color }}
-          />
-        </div>
-      </ToggleButton>
+        label={label}
+      />
     );
   });
   return (
@@ -189,9 +187,7 @@ function Medication(props) {
             title="Choose medication color"
           />
         </Col>
-        <Col xs={6}>
-          <ButtonGroup name="medType">{medTypesOptions}</ButtonGroup>
-        </Col>
+        <Col xs={6}>{medTypesOptions}</Col>
       </Row>
       <Form.Group className="mb-2">
         <Form.Label htmlFor={`med-instructions-${props.medIdx}`}>
