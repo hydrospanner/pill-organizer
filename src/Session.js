@@ -16,6 +16,8 @@ import {
 } from "react-bootstrap";
 import { useDrag, useDrop } from "react-dnd";
 
+import { Tablet, Pill } from "./MedTypes";
+
 export const days = [
   { name: "Sunday", abbr: "Sun" },
   { name: "Monday", abbr: "Mon" },
@@ -27,27 +29,9 @@ export const days = [
 ];
 
 function CellPill(props) {
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: "pill",
-    item: {
-      colIdx: props.colIdx,
-      orgRow: props.orgRow,
-    },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
-  }));
-  return (
-    <div
-      className="medication-pill"
-      ref={drag}
-      style={{
-        backgroundColor: props.selectedMed.color,
-        opacity: isDragging ? 0.5 : 1,
-        cursor: isDragging ? "move" : "grab",
-      }}
-    ></div>
-  );
+  const MedTypeComponent =
+    props.selectedMed.medType === "tablet" ? Tablet : Pill;
+  return <MedTypeComponent color={props.selectedMed.color} style={{}} />;
 }
 
 /** The pills in an Organizer Cell */
@@ -80,6 +64,16 @@ function Square(props) {
       isOver: monitor.isOver(),
     }),
   }));
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: "pill",
+    item: {
+      colIdx: props.colIdx,
+      orgRow: props.orgRow,
+    },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  }));
 
   // Popover
   const display = [];
@@ -109,7 +103,7 @@ function Square(props) {
 
   return (
     <div className="square-container">
-      <div className="square" ref={drop}>
+      <div className="square" ref={(node) => drag(drop(node))}>
         <OverlayTrigger
           trigger={["hover", "focus"]}
           placement="bottom-end"
@@ -118,7 +112,8 @@ function Square(props) {
           <button
             style={{
               borderWidth: isOver ? "6px" : "3px",
-              cursor: isOver ? "move" : "pointer",
+              cursor: isOver || isDragging ? "move" : "default",
+              opacity: isDragging ? 0.5 : 1,
             }}
           >
             <CellPills

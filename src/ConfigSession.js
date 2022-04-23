@@ -2,6 +2,8 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, Row, Col, Form } from "react-bootstrap";
 
+import { Tablet, Pill } from "./MedTypes";
+
 const orgRow = {
   morning: { name: "Morning", icon: "fa-mug-saucer", className: "morning" },
   day: { name: "Noon", icon: "fa-sun", className: "noon" },
@@ -91,8 +93,6 @@ function MedicationRule(props) {
 }
 
 function Medication(props) {
-  console.log(`rendering medication ${props.medIdx}`);
-  console.log(props.med);
   let deleteBtn = "";
   if (props.medIdx !== 0) {
     // at least one medication is needed
@@ -124,18 +124,16 @@ function Medication(props) {
     );
   });
   const medTypes = [
-    { name: "Tablet", value: "tablet", class: "medication-pill" },
-    { name: "Pill", value: "pill", class: "medication-pill" },
+    { name: "Tablet", value: "tablet", type: Tablet },
+    { name: "Pill", value: "pill", type: Pill },
   ];
   const medTypesOptions = medTypes.map((type, i) => {
+    const TypeComponent = type.type;
     const label = (
-      <div>
+      <div style={{ textAlign: "center" }}>
         {type.name}
-        <div style={{ height: "5vw", width: "5vw" }}>
-          <div
-            className={type.class}
-            style={{ backgroundColor: props.med.color }}
-          />
+        <div style={{ height: "4em", width: "4em", display: "flex" }}>
+          <TypeComponent color={props.med.color} />
         </div>
       </div>
     );
