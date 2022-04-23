@@ -173,9 +173,16 @@ ul {
   height: 33.33333333%;
   padding: 0.1vw;
 }
-.square .pill {
+.medication-tablet {
   height: 100%;
   width: 100%;
+  border: 2px solid var(--bs-gray-800);
+  border-radius: 100vw;
+}
+
+.medication-pill {
+  height: 100%;
+  width: 58%;
   border: 2px solid var(--bs-gray-800);
   border-radius: 100vw;
 }

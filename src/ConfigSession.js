@@ -2,6 +2,8 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, Row, Col, Form } from "react-bootstrap";
 
+import { Tablet, Pill } from "./MedTypes";
+
 const orgRow = {
   morning: { name: "Morning", icon: "fa-mug-saucer", className: "morning" },
   day: { name: "Noon", icon: "fa-sun", className: "noon" },
@@ -121,6 +123,35 @@ function Medication(props) {
       />
     );
   });
+  const medTypes = [
+    { name: "Tablet", value: "tablet", type: Tablet },
+    { name: "Pill", value: "pill", type: Pill },
+  ];
+  const medTypesOptions = medTypes.map((type, i) => {
+    const TypeComponent = type.type;
+    const label = (
+      <div style={{ textAlign: "center" }}>
+        {type.name}
+        <div style={{ height: "4em", width: "4em", display: "flex" }}>
+          <TypeComponent color={props.med.color} />
+        </div>
+      </div>
+    );
+    return (
+      <Form.Check
+        inline
+        name={`medType-${props.medIdx}`}
+        key={`${props.medIdx}-${i}`}
+        type="radio"
+        variant="outline-secondary"
+        value={type.value}
+        id={`medType-${type.value}-${props.medIdx}`}
+        checked={props.med.medType === type.value}
+        onChange={(e) => props.handleMedChange(e, props.medIdx)}
+        label={label}
+      />
+    );
+  });
   return (
     <div className="medication-form">
       <Row>
@@ -154,6 +185,7 @@ function Medication(props) {
             title="Choose medication color"
           />
         </Col>
+        <Col xs={6}>{medTypesOptions}</Col>
       </Row>
       <Form.Group className="mb-2">
         <Form.Label htmlFor={`med-instructions-${props.medIdx}`}>
