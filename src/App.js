@@ -43,7 +43,7 @@ function TabController() {
           <About />
         </Tab>
       </Tabs>
-      {(key == "session" || key === "config") && organizer}
+      {(key === "session" || key === "config") && organizer}
     </React.Fragment>
   );
 }
