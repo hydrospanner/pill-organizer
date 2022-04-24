@@ -1,14 +1,54 @@
-import React from "react";
+import React, { useState } from "react";
 import cloneDeep from "lodash/cloneDeep";
-import { Button } from "react-bootstrap";
+import { Button, Tabs, Tab } from "react-bootstrap";
 import { Session } from "./Session";
 import {
   SessionConfig,
   organizerModes,
   defaultMedColors,
 } from "./ConfigSession";
+import { About } from "./About";
 
-export class App extends React.Component {
+export function App() {
+  return (
+    <div className="container">
+      <div>
+        <h1>Pill Master 3000</h1>
+      </div>
+      <TabController />
+    </div>
+  );
+}
+
+function TabController() {
+  const [key, setKey] = useState("config");
+
+  const organizer = (
+    <OrganizerController
+      showSessionConfig={key === "config"}
+      setTab={(k) => setKey(k)}
+    />
+  );
+  return (
+    <React.Fragment>
+      <Tabs
+        id="controlled-tab-example"
+        activeKey={key}
+        onSelect={(k) => setKey(k)}
+        className="mb-3"
+      >
+        <Tab eventKey="config" title="Setup"></Tab>
+        <Tab eventKey="session" title="Session"></Tab>
+        <Tab eventKey="about" title="About">
+          <About />
+        </Tab>
+      </Tabs>
+      {(key == "session" || key === "config") && organizer}
+    </React.Fragment>
+  );
+}
+
+class OrganizerController extends React.Component {
   // Handle modifications to game config here
   // - (e.g., row/rule changes)
   constructor(props) {
@@ -25,7 +65,6 @@ export class App extends React.Component {
       organizerMode: organizerModes[2],
       medications: [cloneDeep(this.newMedication)],
       sessionKey: 0,
-      showSessionConfig: true,
     };
   }
 
@@ -115,15 +154,13 @@ export class App extends React.Component {
   }
 
   handleSessionConfigSubmit(event) {
-    this.setState({
-      showSessionConfig: false,
-    });
+    this.props.setTab("session");
     event.preventDefault();
   }
 
   render() {
     let sessionConfig = null;
-    if (this.state.showSessionConfig) {
+    if (this.props.showSessionConfig) {
       sessionConfig = (
         <SessionConfig
           onSubmit={(e) => this.handleSessionConfigSubmit(e)}
@@ -145,11 +182,8 @@ export class App extends React.Component {
       );
     }
     return (
-      <div className="container">
-        <div>
-          <h1>Pill Master 3000</h1>
-        </div>
-        {!this.state.showSessionConfig && (
+      <React.Fragment>
+        {!this.props.showSessionConfig && (
           <React.Fragment>
             <Session
               organizerMode={this.state.organizerMode}
@@ -158,7 +192,7 @@ export class App extends React.Component {
             />
             <Button
               className="mb-2 mt-5"
-              onClick={() => this.setState({ showSessionConfig: true })}
+              onClick={() => this.props.setTab("config")}
               type="Button"
               variant="outline-secondary"
             >
@@ -167,7 +201,7 @@ export class App extends React.Component {
           </React.Fragment>
         )}
         {sessionConfig}
-      </div>
+      </React.Fragment>
     );
   }
 }
