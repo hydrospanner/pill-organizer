@@ -10,6 +10,8 @@ import {
   faTrash,
   faPills,
   faBed,
+  faTablets,
+  faCapsules,
 } from "@fortawesome/free-solid-svg-icons";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -18,7 +20,7 @@ import { TouchBackend } from "react-dnd-touch-backend";
 
 import { App } from "./App";
 
-library.add(faMugSaucer, faSun, faMoon, faTrash, faPills, faBed);
+library.add(faMugSaucer, faSun, faMoon, faTrash, faPills, faBed, faTablets, faCapsules);
 
 const container = document.getElementById("root");
 const root = createRoot(container);

@@ -259,8 +259,8 @@ export class SessionConfig extends React.Component {
               type="Button"
               variant="secondary"
             >
-              Add Medication
-              <FontAwesomeIcon icon="fa-solid fa-pills" />
+              <span className="me-2">Add Medication</span>
+              <FontAwesomeIcon icon="fa-solid fa-pills" size="lg"/>
             </Button>
             <Button type="Submit" variant="primary">
               Save & Start Session
