@@ -453,7 +453,7 @@ export class Session extends React.Component {
                   type="button"
                   onClick={() => this.setComplianceMsg()}
                 >
-                  Done (check rules)
+                  check accuracy
                 </Button>
               </div>
               {complianceMsg}
