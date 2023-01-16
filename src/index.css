@@ -200,7 +200,7 @@ ul {
 /* add contrast with border around pill bottle medications */
 .game .pill-bottle svg path {
   stroke: black;
-  stroke-width: 10;
+  stroke-width: 5;
 }
 
 /* the click and drag is accidently selecting some things */
