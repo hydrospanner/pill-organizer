@@ -217,6 +217,7 @@ function MoveHistory(props) {
 }
 
 const PillBottle = (props) => {
+  const medIcon = (props.selectedMed.medType === "tablet") ? 'fa-tablets' : "fa-capsules";
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "pill-bottle",
     collect: (monitor) => ({
@@ -246,7 +247,7 @@ const PillBottle = (props) => {
         }}
       >
         <FontAwesomeIcon
-          icon="fa-pills"
+          icon={medIcon}
           size="3x"
           style={{
             color: props.selectedMed.color,
