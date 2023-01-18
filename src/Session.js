@@ -378,9 +378,17 @@ export class Session extends React.Component {
       const instructionList = this.state.selectedMed.rules.map((rule, i) => {
         const timeOpts = this.props.organizerMode.rows.map((row, j) => {
           if (rule[row.name]) {
+            let dayText;
+            // Check that the rule days are all true
+            const trueDays = Object.keys(rule.days).filter(day => rule.days[day]);
+            if (trueDays.length === days.length) {
+              dayText = 'Daily';
+            } else {
+              dayText = trueDays.join(', ');
+            }
             return (
               <li key={`${i}-${j}`}>
-                Take {rule.take} at {row.name} Daily
+                Take {rule.take} at {row.name} {dayText}
               </li>
             );
           }
@@ -453,7 +461,7 @@ export class Session extends React.Component {
                   type="button"
                   onClick={() => this.setComplianceMsg()}
                 >
-                  check accuracy
+                  Check Accuracy
                 </Button>
               </div>
               {complianceMsg}
@@ -489,13 +497,21 @@ function determineCompliance(squares, medications) {
     med.rules.forEach((rule) => {
       for (const rowName in squares) {
         let dailyTake;
+        // Not every row (e.g. Noon) has a rule
         if (rule[rowName]) {
           // compare the amounts in the squares row for the med to the rule.take
           dailyTake = rule.take;
         } else {
           dailyTake = 0;
         }
-        const ruleAmt = new Array(days.length).fill(dailyTake);
+
+        // Default amount to zero, then set the take amount if day is checked.
+        const ruleAmt = new Array(days.length).fill(0);
+        days.forEach((day, dayIdx) => {
+          if (rule.days[day.abbr]) {
+            ruleAmt[dayIdx] = dailyTake;
+          }
+        })
         combinedRules[rowName] = addVector(combinedRules[rowName], ruleAmt);
       }
     });

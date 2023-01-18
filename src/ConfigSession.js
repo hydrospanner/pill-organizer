@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, Row, Col, Form } from "react-bootstrap";
 
 import { Tablet, Pill } from "./MedTypes";
+import { days } from "./Session";
 
 const orgRow = {
   morning: { name: "Morning", icon: "fa-mug-saucer", className: "morning" },
@@ -49,6 +50,22 @@ function MedicationRule(props) {
       />
     );
   });
+  const dayOpts = days.map((day, i) => {
+    return (
+    <Form.Check
+      type="checkbox"
+      data-rule-group="days"
+      key={`med-rule-day-${props.medIdx}-${props.ruleIdx}-${i}`}
+      name={day.abbr}
+      label={day.name}
+      id={`med-rule-day-${props.medIdx}-${props.ruleIdx}-${i}`}
+      onChange={(e) =>
+        props.handleMedRuleChange(e, props.medIdx, props.ruleIdx)
+      }
+      checked={props.rule.days[day.abbr] === true}
+      />
+    );
+  })
 
   return (
     <div className="medication-rule">
@@ -70,7 +87,8 @@ function MedicationRule(props) {
           </Form.Group>
         </Col>
         <Col sm={4} xs={6}>
-          <Form.Check type="checkbox" label="Daily" checked={true} disabled />
+          <Form.Label>Days</Form.Label>
+          {dayOpts}
         </Col>
         <Col sm={3} xs={6}>
           at
