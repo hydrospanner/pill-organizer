@@ -55,7 +55,7 @@ function MedicationRule(props) {
     <Form.Check
       type="checkbox"
       data-rule-group="days"
-      key={`med-rule-day-${props.medIdx}-${props.ruleIdx}-${i}`}
+      key={i}
       name={day.abbr}
       label={day.name}
       id={`med-rule-day-${props.medIdx}-${props.ruleIdx}-${i}`}

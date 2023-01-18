@@ -57,7 +57,7 @@ class OrganizerController extends React.Component {
     this.newMedication = {
       name: "",
       instructions: "",
-      rules: [Object.create(this.newRule)],
+      rules: [cloneDeep(this.newRule)],
       color: defaultMedColors[0],
       medType: "tablet",
     };
