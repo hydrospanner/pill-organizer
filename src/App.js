@@ -53,7 +53,7 @@ class OrganizerController extends React.Component {
   // - (e.g., row/rule changes)
   constructor(props) {
     super(props);
-    this.newRule = { take: 1 };
+    this.newRule = { take: 1 , days: {}};
     this.newMedication = {
       name: "",
       instructions: "",
@@ -137,7 +137,13 @@ class OrganizerController extends React.Component {
     }
     const name = target.name;
     const meds = cloneDeep(this.state.medications);
-    meds[medKey].rules[ruleKey][name] = value;
+    // Check target for special group data attr. If exists set name: val to that object.
+    const ruleGroup = target.getAttribute('data-rule-group');
+    if (ruleGroup) {
+      meds[medKey].rules[ruleKey][ruleGroup][name] = value;
+    } else {
+      meds[medKey].rules[ruleKey][name] = value;
+    }
     this.setState({
       medications: meds,
     });
