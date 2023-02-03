@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/pill-organizer/static/css/main.23b7646a.css",
-    "main.js": "/pill-organizer/static/js/main.887463c7.js",
+    "main.css": "/pill-organizer/static/css/main.f3f1153e.css",
+    "main.js": "/pill-organizer/static/js/main.ce3d73d3.js",
     "index.html": "/pill-organizer/index.html",
-    "main.23b7646a.css.map": "/pill-organizer/static/css/main.23b7646a.css.map",
-    "main.887463c7.js.map": "/pill-organizer/static/js/main.887463c7.js.map"
+    "main.f3f1153e.css.map": "/pill-organizer/static/css/main.f3f1153e.css.map",
+    "main.ce3d73d3.js.map": "/pill-organizer/static/js/main.ce3d73d3.js.map"
   },
   "entrypoints": [
-    "static/css/main.23b7646a.css",
-    "static/js/main.887463c7.js"
+    "static/css/main.f3f1153e.css",
+    "static/js/main.ce3d73d3.js"
   ]
 }
