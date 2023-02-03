@@ -212,3 +212,12 @@ ul {
   -ms-user-select: none;
   user-select: none;
 }
+
+/* Prevent closing the only medication or rule */
+.medication-form:only-child .delete-medication {
+  display: none;
+}
+
+.medication-form .medication-rule:only-child .delete {
+  display: none;
+}

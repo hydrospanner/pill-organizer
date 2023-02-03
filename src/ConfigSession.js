@@ -52,20 +52,20 @@ function MedicationRule(props) {
   });
   const dayOpts = days.map((day, i) => {
     return (
-    <Form.Check
-      type="checkbox"
-      data-rule-group="days"
-      key={i}
-      name={day.abbr}
-      label={day.name}
-      id={`med-rule-day-${props.medIdx}-${props.ruleIdx}-${i}`}
-      onChange={(e) =>
-        props.handleMedRuleChange(e, props.medIdx, props.ruleIdx)
-      }
-      checked={props.rule.days[day.abbr] === true}
+      <Form.Check
+        type="checkbox"
+        data-rule-group="days"
+        key={i}
+        name={day.abbr}
+        label={day.name}
+        id={`med-rule-day-${props.medIdx}-${props.ruleIdx}-${i}`}
+        onChange={(e) =>
+          props.handleMedRuleChange(e, props.medIdx, props.ruleIdx)
+        }
+        checked={props.rule.days[day.abbr] === true}
       />
     );
-  })
+  });
 
   return (
     <div className="medication-rule">
@@ -111,19 +111,15 @@ function MedicationRule(props) {
 }
 
 function Medication(props) {
-  let deleteBtn = "";
-  if (props.medIdx !== 0) {
-    // at least one medication is needed
-    deleteBtn = (
-      <Button
-        variant="outline-danger"
-        className="delete"
-        onClick={(e) => props.handleMedDelete(e, props.medIdx)}
-      >
-        <FontAwesomeIcon icon="fa-solid fa-trash" />
-      </Button>
-    );
-  }
+  const deleteBtn = (
+    <Button
+      variant="outline-danger"
+      className="delete delete-medication"
+      onClick={(e) => props.handleMedDelete(e, props.medIdx)}
+    >
+      <FontAwesomeIcon icon="fa-solid fa-trash" />
+    </Button>
+  );
   const rules = props.med.rules.map((rule, i) => {
     return (
       <MedicationRule
@@ -278,7 +274,7 @@ export class SessionConfig extends React.Component {
               variant="secondary"
             >
               <span className="me-2">Add Medication</span>
-              <FontAwesomeIcon icon="fa-solid fa-pills" size="lg"/>
+              <FontAwesomeIcon icon="fa-solid fa-pills" size="lg" />
             </Button>
             <Button type="Submit" variant="primary">
               Save & Start Session
